@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Traits\ResponseApiTrait;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
@@ -21,6 +22,8 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseController extends Controller
 {
+    use ResponseApiTrait;
+
     /**
      * Instance of the main Request object.
      *
@@ -37,6 +40,10 @@ abstract class BaseController extends Controller
      */
     protected $helpers = [];
 
+    protected $validation;
+
+    protected $payload;
+
     /**
      * Be sure to declare properties for any property fetch you initialized.
      * The creation of dynamic property is deprecated in PHP 8.2.
@@ -52,7 +59,27 @@ abstract class BaseController extends Controller
         parent::initController($request, $response, $logger);
 
         // Preload any models, libraries, etc, here.
+        $this->validation = \Config\Services::validation();
+
+        $this->payload = $this->request->getJSON(true);
 
         // E.g.: $this->session = \Config\Services::session();
+    }
+
+    protected function getPayload()
+    {
+        $this->payload = $this->request->getJSON(true);
+        return $this->payload;
+    }
+
+    protected function runPayloadValidation(array $validationRule, array $payload)
+    {
+        $this->validation->setRules($validationRule);
+        $isDataValid = $this->validation->run($payload);
+        if (!$isDataValid) {
+            return $this->failedValidationResponse($this->validation->getErrors());
+        }
+
+        return true;
     }
 }

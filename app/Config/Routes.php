@@ -31,6 +31,21 @@ $routes->set404Override();
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 
+/**
+ * ---------------------------------------------------------------------
+ * API Routing V1
+ * ---------------------------------------------------------------------
+ */
+$routes->group('api', static function ($routes) {
+    $routes->group('v1', static function ($routes) {
+        $routes->get('users', '\Core\Users\Controllers\GetUserController::index');
+        $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
+        $routes->post('users', '\Core\Users\Controllers\ManageUserController::create');
+        $routes->put('users', '\Core\Users\Controllers\ManageUserController::update');
+    });
+});
+
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

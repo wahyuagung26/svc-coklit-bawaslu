@@ -41,7 +41,9 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH, // For custom app namespace
-        'Config'      => APPPATH . 'Config',
+        'Config' => APPPATH . 'Config',
+        'Core' => ROOTPATH . 'core',
+        'Core\Users' => ROOTPATH . 'core\Users'
     ];
 
     /**
@@ -79,7 +81,7 @@ class Autoload extends AutoloadConfig
      * @var string[]
      * @phpstan-var list<string>
      */
-    public $files = [];
+    public $files = [APPPATH . 'Config/ConstantsApp.php'];
 
     /**
      * -------------------------------------------------------------------
