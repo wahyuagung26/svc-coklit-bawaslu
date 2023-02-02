@@ -40,4 +40,8 @@ class UsersPayloadEntity extends Entity
 
         $this->attributes['password'] = password_hash($password, PASSWORD_BCRYPT);
     }
+
+    public function setIsDeleted($isDeleted) {
+        $this->attributes['is_deleted'] = empty($isDeleted) ? 0 : $isDeleted;
+    }
 }

@@ -17,17 +17,45 @@ class ManageUserController extends BaseController
     }
 
     private $createRule = [
-        'name' => 'required|max_length[50]',
-        'username' => 'required|max_length[10]',
-        'password' => 'required',
-        'role' => 'required',
+        'name' => [
+            'label' => 'Nama',
+            'rules' => 'required|max_length[50]'
+        ],
+        'username' => [
+            'label' => 'Username',
+            'rules' => 'required|max_length[20]'
+        ],
+        'password' => [
+            'label' => 'Password',
+            'rules' => 'required'
+        ],
+        'role' => [
+            'label' => 'Hak Akses',
+            'rules' => 'required'
+        ],
+        'm_districts_id' => [
+            'label' => 'Kecamatan',
+            'rules' => 'required'
+        ]
     ];
 
     private $updateRule = [
-        'id' => 'required',
-        'name' => 'required|max_length[50]',
-        'username' => 'required|max_length[10]',
-        'role' => 'required',
+        'name' => [
+            'label' => 'Nama',
+            'rules' => 'required|max_length[50]'
+        ],
+        'username' => [
+            'label' => 'Username',
+            'rules' => 'required|max_length[20]'
+        ],
+        'role' => [
+            'label' => 'Hak Akses',
+            'rules' => 'required'
+        ],
+        'm_districts_id' => [
+            'label' => 'Kecamatan',
+            'rules' => 'required'
+        ]
     ];
 
     public function create()
@@ -36,7 +64,7 @@ class ManageUserController extends BaseController
         $this->checkIsUserAlreadyRegistered($this->payload['username'] ?? '');
 
         $user = new UsersPayloadEntity($this->payload);
-        $model = $this->user->insert($user);
+        $model = $this->user->insert($user->toArray(true));
         return $this->successResponse($model);
     }
 
@@ -47,7 +75,7 @@ class ManageUserController extends BaseController
         $this->checkIsUserAlreadyRegistered($this->payload['username'], $this->payload['id']);
 
         $user = new UsersPayloadEntity($this->payload);
-        $model = $this->user->update($this->payload['id'], $user->getFilledAtrributes());
+        $model = $this->user->update($this->payload['id'], $user->toArray(true));
         return $this->successResponse($model);
     }
 

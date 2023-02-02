@@ -38,6 +38,8 @@ $routes->get('/', 'Home::index');
  */
 $routes->group('api', static function ($routes) {
     $routes->group('v1', static function ($routes) {
+        $routes->post('login', '\Core\Users\Controllers\AuthController::login');
+
         $routes->get('users', '\Core\Users\Controllers\GetUserController::index');
         $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
         $routes->post('users', '\Core\Users\Controllers\ManageUserController::create');

@@ -4,6 +4,7 @@ namespace Core\Users\Models;
 
 use App\Models\CoreModel;
 use App\Traits\ConvertEntityTrait;
+use Core\Users\Entities\AuthEntity;
 use Core\Users\Entities\UsersResponseEntity;
 
 class GetUserModel extends CoreModel
@@ -13,24 +14,44 @@ class GetUserModel extends CoreModel
     protected $table = 'm_user';
     protected $returnType = 'array';
 
+    private $isNeedPassword = false;
+
     public function getUsers()
     {
         $this->select([
             'm_user.id',
             'm_user.name',
+            'm_user.username',
+            'm_user.password',
             'm_user.phone_number',
             'm_user.m_districts_id as district_id',
             'm_districts.district_name',
             'm_user.m_villages_id as village_id',
             'm_villages.village_name',
             'm_user.role',
-            'm_user.last_login'
+            'm_user.last_login',
+            'm_user.id token'
         ])->table('m_user')
         ->join('m_districts', 'm_user.m_districts_id = m_districts.id')
         ->join('m_villages', 'm_user.m_villages_id = m_villages.id', 'left')
         ->where('m_user.is_deleted', 0);
 
         return $this;
+    }
+
+    public function auth(string $username, string $password)
+    {
+        $query = $this->getUsers()->where('username', $username);
+        $user = $query->first();
+        if (empty($user)) {
+            return false;
+        }
+
+        if (!password_verify($password, $user['password'])) {
+            return false;
+        }
+
+        return $this->convertEntity(AuthEntity::class, $user);
     }
 
     public function getByUsername(string $username, $exceptUserId = 0)

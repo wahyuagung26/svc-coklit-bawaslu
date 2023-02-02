@@ -9,7 +9,8 @@ trait BaseEntityTrait
     public function __construct($payload)
     {
         $this->payload = $payload;
-        $this->fillAttributes();
+        $this->syncOriginal();
+        $this->fill($payload);
     }
 
     public function getFilledAtrributes()
@@ -25,10 +26,12 @@ trait BaseEntityTrait
         return $this->attributes;
     }
 
-    private function fillAttributes()
+    public function fill(?array $data = null)
     {
         foreach ($this->attributes as $key => $val) {
-            $this->attributes[$key] = $this->payload[$key] ?? null;
+            $this->__set($key, $data[$key] ?? null);
         }
+
+        return $this;
     }
 }

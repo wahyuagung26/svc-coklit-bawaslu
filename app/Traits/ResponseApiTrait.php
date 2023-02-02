@@ -43,7 +43,8 @@ trait ResponseApiTrait
     {
         $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message
-        ])->send();
+        ])
+        ->send();
 
         exit;
     }

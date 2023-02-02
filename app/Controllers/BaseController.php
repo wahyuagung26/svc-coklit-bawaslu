@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\JwtAuth;
 use App\Traits\ResponseApiTrait;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
@@ -61,14 +62,19 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         $this->validation = \Config\Services::validation();
 
-        $this->payload = $this->request->getJSON(true);
+        $this->setPayload($this->request->getJSON(true) ?? []);
 
         // E.g.: $this->session = \Config\Services::session();
     }
 
-    protected function getPayload()
+    public function getPayload()
     {
-        $this->payload = $this->request->getJSON(true);
+        return $this->payload;
+    }
+
+    public function setPayload(array $data)
+    {
+        $this->payload = $data;
         return $this->payload;
     }
 
@@ -81,5 +87,10 @@ abstract class BaseController extends Controller
         }
 
         return true;
+    }
+
+    protected function user()
+    {
+        return JwtAuth::user();
     }
 }
