@@ -4,11 +4,13 @@ namespace Core\Voters\Models;
 
 class ProfileVotersModel extends BaseVotersModel
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
     protected $allowedFields = [
-        'district_id',
-        'district_name',
-        'village_id',
-        'village_name',
+        'm_district_id',
+        'm_village_id',
         'nkk',
         'nik',
         'name',

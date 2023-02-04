@@ -42,14 +42,16 @@ $routes->group('api', static function ($routes) {
         $routes->post('login', '\Core\Users\Controllers\AuthController::login');
 
         $routes->get('users', '\Core\Users\Controllers\GetUserController::index');
-        $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
         $routes->post('users', '\Core\Users\Controllers\ManageUserController::create');
         $routes->put('users', '\Core\Users\Controllers\ManageUserController::update');
+        $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
 
         $routes->post('voters/(:any)/generate/(:any)', '\Core\Voters\Controllers\GenerateController::run/$1/$2');
-        $routes->post('voters/(:any)/coklit/summary/(:any)', '\Core\Voters\Controllers\GetVotersController::getCoklitSummary/$1/$2');
-        $routes->put('voters/(:any)/profile', '\Core\Voters\Controllers\UpdateVoterController::profile/$1');
+        $routes->get('voters/(:any)/coklit/(:any)', '\Core\Voters\Controllers\GetVotersController::getCoklitSummary/$1/$2');
+        $routes->put('voters/(:any)/profile', '\Core\Voters\Controllers\UpdateVotersController::profile/$1');
+        $routes->put('voters/(:any)/status', '\Core\Voters\Controllers\UpdateVotersController::statusVoter/$1');
         $routes->get('voters/(:any)', '\Core\Voters\Controllers\GetVotersController::index/$1');
+        $routes->post('voters/(:any)', '\Core\Voters\Controllers\CreateVotersController::run/$1');
     });
 });
 
