@@ -17,11 +17,11 @@ class GetUserController extends BaseController
     public function index()
     {
         $payload = $this->getPayload();
-        $page = $payload['page'] ?? 1;
+        $payload['page'] = $payload['page'] ?? 1;
 
         $users = $this->user->getUsers()
                             ->setFilter($payload)
-                            ->pagination($page);
+                            ->pagination($payload['page']);
 
         return $this->paginationResponse($users['data'], $users['meta']);
     }
@@ -29,10 +29,11 @@ class GetUserController extends BaseController
     public function getById($userId)
     {
         $user = $this->user->getById($userId);
-        if (empty($user)) {
-            return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
+
+        if (isset($user->id)) {
+            return $this->successResponse($user);
         }
 
-        return $this->successResponse($user);
+        return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
     }
 }

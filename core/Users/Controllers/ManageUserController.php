@@ -65,6 +65,7 @@ class ManageUserController extends BaseController
 
         $user = new UsersPayloadEntity($this->payload);
         $model = $this->user->insert($user->toArray(true));
+
         return $this->successResponse($model);
     }
 
@@ -76,6 +77,7 @@ class ManageUserController extends BaseController
 
         $user = new UsersPayloadEntity($this->payload);
         $model = $this->user->update($this->payload['id'], $user->toArray(true));
+
         return $this->successResponse($model);
     }
 
@@ -83,6 +85,7 @@ class ManageUserController extends BaseController
     {
         $model = new GetUserModel();
         $user = $model->getByUsername($username, $exceptionId);
+
         if (isset($user->id)) {
             return $this->errorResponse('username already registered', HTTP_STATUS_UNPROCESS);
         }
@@ -93,9 +96,9 @@ class ManageUserController extends BaseController
     private function checkIsUserExists($userId)
     {
         $model = new GetUserModel();
-        $user = $model->find($userId);
+        $user = $model->getById($userId);
 
-        if (empty($user)) {
+        if (!isset($user->id)) {
             return $this->errorResponse('user not found', HTTP_STATUS_UNPROCESS);
         }
     }

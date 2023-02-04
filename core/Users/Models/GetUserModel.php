@@ -2,12 +2,10 @@
 
 namespace Core\Users\Models;
 
-use App\Models\CoreModel;
 use App\Traits\ConvertEntityTrait;
-use Core\Users\Entities\AuthEntity;
 use Core\Users\Entities\UsersResponseEntity;
 
-class GetUserModel extends CoreModel
+class GetUserModel extends BaseUserModel
 {
     use ConvertEntityTrait;
 
@@ -35,21 +33,6 @@ class GetUserModel extends CoreModel
         ->where('m_user.is_deleted', 0);
 
         return $this;
-    }
-
-    public function auth(string $username, string $password)
-    {
-        $query = $this->getUsers()->where('username', $username);
-        $user = $query->first();
-        if (empty($user)) {
-            return false;
-        }
-
-        if (!password_verify($password, $user['password'])) {
-            return false;
-        }
-
-        return $this->convertEntity(AuthEntity::class, $user);
     }
 
     public function getByUsername(string $username, $exceptUserId = 0)

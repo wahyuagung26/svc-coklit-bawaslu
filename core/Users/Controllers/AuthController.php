@@ -3,7 +3,7 @@
 namespace Core\Users\Controllers;
 
 use App\Controllers\BaseController;
-use Core\Users\Models\GetUserModel;
+use Core\Users\Models\AuthModel;
 
 class AuthController extends BaseController
 {
@@ -16,9 +16,13 @@ class AuthController extends BaseController
     {
         $this->runPayloadValidation($this->loginRule, $this->payload);
 
-        $model = new GetUserModel();
-        $user = $model->auth($this->payload['username'] ?? '', $this->payload['password'] ?? '');
-        if (isset($user['id'])) {
+        $model = new AuthModel();
+        $user = $model->login($this->payload['username'] ?? '', $this->payload['password'] ?? '');
+
+        if (isset($user->id)) {
+            $user->last_login = date('Y-m-d H:i:s');
+            $model->save($user);
+
             return $this->successResponse($user);
         }
 

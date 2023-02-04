@@ -6,30 +6,27 @@ use Exception;
 
 class GenerateModel extends BaseVotersModel
 {
-    protected $table = 'voters_pra_dps';
-    protected $sourceTable = 'voters_original';
-
-    protected $generatedColumn = '
-        m_districts_id,
-        m_villages_id,
-        nkk,
-        nik,
-        name,
-        place_of_birth,
-        date_of_birth,
-        married_status,
-        gender,
-        address,
-        rt,
-        rw,
-        disabilities,
-        m_data_status_id,
-        tps
-    ';
+    protected $generatedColumn = [
+        'voters_original_id' => 'id as voters_original_id',
+        'm_districts_id' => 'm_districts_id',
+        'm_villages_id' => 'm_villages_id',
+        'nkk' => 'nkk',
+        'nik' => 'nik',
+        'name' => 'name',
+        'place_of_birth' => 'place_of_birth',
+        'date_of_birth' => 'date_of_birth',
+        'married_status' => 'married_status',
+        'gender' => 'gender',
+        'address' => 'address',
+        'rt' => 'rt',
+        'rw' => 'rw',
+        'disabilities' => 'disabilities',
+        'tps' => 'tps',
+    ];
 
     public function setGeneratedColumn(array $column)
     {
-        return $this->generatedColumn = join(',', $column);
+        $this->generatedColumn = $column;
         return $this;
     }
 
@@ -59,14 +56,10 @@ class GenerateModel extends BaseVotersModel
 
     private function startGenerate()
     {
-        $queryInsert = "INSERT INTO {$this->table} (
-            {$this->generatedColumn}
-        )";
+        $castColumn = $this->castGeneratedColumn($this->generatedColumn);
 
-        $querySourceData = "SELECT
-            {$this->generatedColumn}
-        from
-            {$this->sourceTable};";
+        $queryInsert = "INSERT INTO {$this->table} ({$castColumn['inserted']})";
+        $querySourceData = "SELECT {$castColumn['selected']} from {$this->sourceTable};";
 
         $this->db->transStart();
         $this->db->query($queryInsert . ' '. $querySourceData);
@@ -93,5 +86,22 @@ class GenerateModel extends BaseVotersModel
         }
 
         return $this;
+    }
+
+    private function castGeneratedColumn(array $generatedColumn)
+    {
+        if (isset($generatedColumn[0])) {
+            $inserted = $selected = $generatedColumn;
+        } else {
+            foreach ($generatedColumn as $insertedColumn => $selectedColumn) {
+                $inserted[] = $insertedColumn;
+                $selected[] = $selectedColumn;
+            }
+        }
+
+        return [
+            'selected' => join(',', $selected),
+            'inserted' => join(',', $inserted)
+        ];
     }
 }

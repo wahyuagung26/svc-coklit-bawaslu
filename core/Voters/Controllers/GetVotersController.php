@@ -3,8 +3,8 @@
 namespace Core\Voters\Controllers;
 
 use Core\StatusData\Entities\StatusDataEntity;
+use Core\Voters\Models\CoklitSummaryModel;
 use Core\Voters\Models\GetVotersModel;
-use Core\Voters\Models\VotersOriginalModel;
 
 class GetVotersController extends BaseVotersController
 {
@@ -17,6 +17,20 @@ class GetVotersController extends BaseVotersController
         $voters = $this->getDataByStatus($payload, $statusData);
 
         return $this->paginationResponse($voters['data'] ?? [], $voters['meta'] ?? []);
+    }
+
+    public function getCoklitSummary($statusDataId, $villageId)
+    {
+        $village = $this->getVillage($villageId);
+        $statusData = $this->getStatusData($statusDataId);
+
+        $model = new CoklitSummaryModel();
+        $model->setActiveTable($statusData->active_table_source)->setVillageId($village->id);
+
+        return $this->successResponse([
+            'total_coklit' => $model->getTotalCoklit(),
+            'total_uncoklit' => $model->getTotalUnCoklit()
+        ]);
     }
 
     private function getDataByStatus(array $payload, StatusDataEntity $statusData)
