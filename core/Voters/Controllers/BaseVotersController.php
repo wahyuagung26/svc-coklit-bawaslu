@@ -30,4 +30,11 @@ class BaseVotersController extends BaseController
 
         return $village;
     }
+
+    protected function update($class, $table, $payload)
+    {
+        $model = new $class();
+        $model->setActiveTable($table)->update($payload['id'], $payload);
+        return $model;
+    }
 }

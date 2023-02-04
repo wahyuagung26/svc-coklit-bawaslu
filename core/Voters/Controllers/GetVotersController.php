@@ -19,7 +19,7 @@ class GetVotersController extends BaseVotersController
         return $this->paginationResponse($voters['data'] ?? [], $voters['meta'] ?? []);
     }
 
-    public function getCoklitSummary($statusDataId, $villageId)
+    public function coklitSummary($statusDataId, $villageId)
     {
         $village = $this->getVillage($villageId);
         $statusData = $this->getStatusData($statusDataId);

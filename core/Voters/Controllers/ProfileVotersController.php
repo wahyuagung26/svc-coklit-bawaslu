@@ -2,10 +2,9 @@
 
 namespace Core\Voters\Controllers;
 
-use Core\Voters\Models\StatusVotersModel;
 use Core\Voters\Models\ProfileVotersModel;
 
-class UpdateVotersController extends BaseVotersController
+class ProfileVotersController extends BaseVotersController
 {
     private $profileVoterRule = [
         'id' => [
@@ -66,38 +65,16 @@ class UpdateVotersController extends BaseVotersController
         ]
     ];
 
-    private $statusVoterRule = [
-        'id' => [
-            'label' => 'ID Pemilih',
-            'rules' => 'required'
-        ],
-    ];
-
-    public function profile($statusDataId)
+    public function edit($statusDataId)
     {
         $this->runPayloadValidation($this->profileVoterRule, $this->payload);
         $this->payload['m_districts_id'] = $this->payload['districts_id'];
         $this->payload['m_villages_id'] = $this->payload['villages_id'];
 
         $statusData = $this->getStatusData($statusDataId);
+        $voter = $this->update(ProfileVotersModel::class, $statusData->active_table_source, $this->payload)
+                        ->getById($this->payload['id']);
 
-        $model = new ProfileVotersModel();
-        $model->setActiveTable($statusData->active_table_source)->update($this->payload['id'], $this->payload);
-
-        $voter = $model->getById($this->payload['id']);
-        return $this->successResponse($voter);
-    }
-
-    public function statusVoter($statusDataId)
-    {
-        $this->runPayloadValidation($this->statusVoterRule, $this->payload);
-
-        $statusData = $this->getStatusData($statusDataId);
-
-        $model = new StatusVotersModel();
-        $model->setActiveTable($statusData->active_table_source)->update($this->payload['id'], $this->payload);
-        
-        $voter = $model->getById($this->payload['id']);
         return $this->successResponse($voter);
     }
 }

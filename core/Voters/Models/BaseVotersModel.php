@@ -32,7 +32,8 @@ class BaseVotersModel extends CoreModel
         return $this;
     }
 
-    protected function getVoters() {
+    protected function getVoters()
+    {
         return $this->select([
             "{$this->table}.id",
             "{$this->table}.voters_original_id",
@@ -63,7 +64,8 @@ class BaseVotersModel extends CoreModel
             "{$this->table}.is_new_data",
         ])->table($this->table)
         ->join("m_districts", "m_districts_id = m_districts.id", "left")
-        ->join("m_villages", "m_villages_id = m_villages.id", "left");
+        ->join("m_villages", "m_villages_id = m_villages.id", "left")
+        ->where("{$this->table}.is_deleted", 0);
     }
 
     public function getById($id)

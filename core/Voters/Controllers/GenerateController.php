@@ -8,7 +8,7 @@ use Core\Voters\Models\GenerateModel;
 
 class GenerateController extends BaseVotersController
 {
-    public function run($statusDataId, $villageId)
+    public function generate($statusDataId, $villageId)
     {
         $statusData = $this->getStatusData($statusDataId);
         $village = $this->getVillage($villageId);

@@ -34,6 +34,7 @@ class VotersEntity extends Entity
         'is_profile_updated' => null,
         'is_checked' => null,
         'is_deleted' => null,
+        'is_new_data' => null,
     ];
 
     protected $casts = [
@@ -48,5 +49,6 @@ class VotersEntity extends Entity
         'is_profile_updated' => 'bool',
         'is_checked' => 'bool',
         'is_deleted' => 'bool',
+        'is_new_data' => 'bool',
     ];
 }
