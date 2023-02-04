@@ -54,7 +54,7 @@ class AuthFilter implements FilterInterface
         } catch (Throwable $ex) {
             $response = service('response');
             $response->setStatusCode(401)->setJSON([
-                'messages' => 'Unauthorized request'
+                'messages' => $ex->getMessage()
             ]);
             return $response;
         }

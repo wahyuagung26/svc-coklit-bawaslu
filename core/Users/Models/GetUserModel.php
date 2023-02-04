@@ -14,8 +14,6 @@ class GetUserModel extends CoreModel
     protected $table = 'm_user';
     protected $returnType = 'array';
 
-    private $isNeedPassword = false;
-
     public function getUsers()
     {
         $this->select([
@@ -97,7 +95,7 @@ class GetUserModel extends CoreModel
         return [
             'data'  => $users ?? [],
             'meta'  => [
-                'total' => $total ?? 0,
+                'total_item' => $total ?? 0,
                 'page'  => 1,
                 'per_page' => DEFAULT_PER_PAGE
             ]

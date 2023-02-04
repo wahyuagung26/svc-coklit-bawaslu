@@ -31,13 +31,13 @@ class Filters extends BaseConfig
      */
     public array $globals = [
         'before' => [
-            'auth' => ['except' => ['api/v1/login']],
+            // 'auth' => ['except' => ['api/v1/login', 'debug']],
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
         ],
         'after' => [
-            'toolbar',
+            'toolbar' => ['except' => ['/debug1']],
             // 'honeypot',
             // 'secureheaders',
         ],

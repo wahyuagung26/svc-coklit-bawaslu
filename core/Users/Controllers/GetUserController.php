@@ -30,17 +30,9 @@ class GetUserController extends BaseController
     {
         $user = $this->user->getById($userId);
         if (empty($user)) {
-            return $this->successResponse(null, 'user not fund', HTTP_STATUS_NOT_FOUND);
+            return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
         }
 
         return $this->successResponse($user);
-    }
-
-    public function update()
-    {
-    }
-
-    public function delete()
-    {
     }
 }

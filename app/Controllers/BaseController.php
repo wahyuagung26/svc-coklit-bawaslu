@@ -62,7 +62,9 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         $this->validation = \Config\Services::validation();
 
-        $this->setPayload($this->request->getJSON(true) ?? []);
+        if(!is_cli()) {
+            $this->setPayload($this->request->getJSON(true) ?? []);
+        }
 
         // E.g.: $this->session = \Config\Services::session();
     }

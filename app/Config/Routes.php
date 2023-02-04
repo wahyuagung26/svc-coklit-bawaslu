@@ -30,6 +30,7 @@ $routes->set404Override();
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
+$routes->get('/debug', 'Home::index');
 
 /**
  * ---------------------------------------------------------------------
@@ -44,9 +45,13 @@ $routes->group('api', static function ($routes) {
         $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
         $routes->post('users', '\Core\Users\Controllers\ManageUserController::create');
         $routes->put('users', '\Core\Users\Controllers\ManageUserController::update');
+
+        $routes->post('voters/generate/(:any)/(:any)', '\Core\Voters\Controllers\GenerateController::run/$1/$2');
+        $routes->get('voters/(:any)', '\Core\Voters\Controllers\GetVotersController::index/$1');
     });
 });
 
+$routes->cli('tools/import', '\Core\Voters\Controllers\ImporterController::run');
 
 /*
  * --------------------------------------------------------------------

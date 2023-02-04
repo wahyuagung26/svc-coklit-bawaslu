@@ -6,7 +6,7 @@ use ReflectionClass;
 
 trait ConvertEntityTrait
 {
-    public function convertEntity($entityClass, &$data)
+    public function convertEntity($entityClass, $data)
     {
         if (empty($data)) {
             return null;

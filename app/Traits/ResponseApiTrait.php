@@ -6,17 +6,15 @@ trait ResponseApiTrait
 {
     public function successResponse($data, string $message = '', int $statusCode = HTTP_STATUS_SUCCESS)
     {
-        $this->response->setStatusCode($statusCode)->setJson([
+        return $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
             'data' => $data
-        ])->send();
-
-        exit;
+        ]);
     }
 
     public function paginationResponse($data, array $metadata, $message = '', int $statusCode = HTTP_STATUS_SUCCESS)
     {
-        $this->response->setStatusCode($statusCode)->setJson([
+        return $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
             'data' => $data,
             'meta' => [
@@ -24,9 +22,7 @@ trait ResponseApiTrait
                 'total_item' => $metadata['total_item'] ?? 0,
                 'per_page' => $metadata['per_page'] ?? DEFAULT_PER_PAGE
             ]
-        ])->send();
-
-        exit;
+        ]);
     }
 
     public function failedValidationResponse(array $error, string $message = '', int $statusCode = HTTP_STATUS_FAILED_VALIDATION)
