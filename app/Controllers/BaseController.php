@@ -63,7 +63,8 @@ abstract class BaseController extends Controller
         $this->validation = \Config\Services::validation();
 
         if(!is_cli()) {
-            $this->setPayload($this->request->getJSON(true) ?? []);
+            $payload = array_merge($this->request->getGet() ?? [], $this->request->getJSON(true) ?? []);
+            $this->setPayload($payload);
         }
 
         // E.g.: $this->session = \Config\Services::session();

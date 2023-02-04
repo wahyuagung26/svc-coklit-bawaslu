@@ -34,14 +34,14 @@ trait ConvertEntityTrait
     {
         $entity = new $entityClass($data);
         unset($data);
-        return $entity->toArray();
+        return $entity;
     }
 
     private function convertMultipleData($entityClass, &$data)
     {
         foreach ($data as $val) {
             $model = new $entityClass($val);
-            $entity[] = $model->toArray();
+            $entity[] = $model;
         }
         unset($data);
         return $entity;

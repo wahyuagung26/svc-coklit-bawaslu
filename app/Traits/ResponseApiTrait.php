@@ -8,7 +8,7 @@ trait ResponseApiTrait
     {
         return $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
-            'data' => $data
+            'data' => &$data
         ]);
     }
 
@@ -16,11 +16,11 @@ trait ResponseApiTrait
     {
         return $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
-            'data' => $data,
+            'data' => &$data,
             'meta' => [
-                'page' => $metadata['page'] ?? 1,
-                'total_item' => $metadata['total_item'] ?? 0,
-                'per_page' => $metadata['per_page'] ?? DEFAULT_PER_PAGE
+                'page' => (int) $metadata['page'] ?? 1,
+                'total_item' => (int) $metadata['total_item'] ?? 0,
+                'per_page' => (int) $metadata['per_page'] ?? DEFAULT_PER_PAGE
             ]
         ]);
     }
@@ -29,7 +29,7 @@ trait ResponseApiTrait
     {
         $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
-            'error' => $error
+            'error' => &$error
         ])->send();
 
         exit;

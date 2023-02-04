@@ -8,6 +8,7 @@ class BaseVotersModel extends CoreModel
 {
     protected $table = 'voters_pra_dps';
     protected $sourceTable = 'voters_original';
+    protected $villageId = '';
 
     public function setActiveTable(string $tableName)
     {
@@ -18,6 +19,12 @@ class BaseVotersModel extends CoreModel
     public function setSourceTable(string $tableName)
     {
         $this->sourceTable = $tableName;
+        return $this;
+    }
+
+    public function setVillageId($villageId)
+    {
+        $this->villageId = $villageId;
         return $this;
     }
 }

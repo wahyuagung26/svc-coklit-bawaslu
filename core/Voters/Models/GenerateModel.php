@@ -8,8 +8,7 @@ class GenerateModel extends BaseVotersModel
 {
     protected $table = 'voters_pra_dps';
     protected $sourceTable = 'voters_original';
-    protected $returnType = 'array';
-    protected $villageId = '';
+
     protected $generatedColumn = '
         m_districts_id,
         m_villages_id,
@@ -27,12 +26,6 @@ class GenerateModel extends BaseVotersModel
         m_data_status_id,
         tps
     ';
-
-    public function setVillageId($villageId)
-    {
-        $this->villageId = $villageId;
-        return $this;
-    }
 
     public function setGeneratedColumn(array $column)
     {

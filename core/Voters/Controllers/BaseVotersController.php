@@ -18,7 +18,7 @@ class BaseVotersController extends BaseController
             return $this->successResponse(null, 'status data pemilih tidak ditemukan', HTTP_STATUS_NOT_FOUND);
         }
 
-        return new StatusDataEntity($status);
+        return $status;
     }
 
     protected function getVillage($villageId): VillagesEntity
@@ -29,6 +29,6 @@ class BaseVotersController extends BaseController
             return $this->successResponse(null, 'desa / kelurahan tidak ditemukan', HTTP_STATUS_NOT_FOUND);
         }
 
-        return new VillagesEntity($village);
+        return $village;
     }
 }
