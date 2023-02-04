@@ -23,5 +23,4 @@ class StatusVotersController extends BaseVotersController
 
         return $this->successResponse($voter);
     }
-
 }

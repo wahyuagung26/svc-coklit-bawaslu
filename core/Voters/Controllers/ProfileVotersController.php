@@ -2,6 +2,7 @@
 
 namespace Core\Voters\Controllers;
 
+use Core\Voters\Entities\VotersEntity;
 use Core\Voters\Models\ProfileVotersModel;
 
 class ProfileVotersController extends BaseVotersController
@@ -72,9 +73,20 @@ class ProfileVotersController extends BaseVotersController
         $this->payload['m_villages_id'] = $this->payload['villages_id'];
 
         $statusData = $this->getStatusData($statusDataId);
-        $voter = $this->update(ProfileVotersModel::class, $statusData->active_table_source, $this->payload)
-                        ->getById($this->payload['id']);
 
-        return $this->successResponse($voter);
+        /**
+         * @todo Menambah kolom baru prev_voters_id pada semua tabel voters sebagai relasi ke data sebelumnya
+         */
+        $oldVoter = new ProfileVotersModel();
+        $oldProfile = $oldVoter->setActiveTable($statusData->prev_table_source)
+                                ->getById($this->payload['id']);
+
+        $currentVoter = new ProfileVotersModel();
+        $currentProfile = $currentVoter->setActiveTable($statusData->active_table_source)
+                                        ->setStatusUpdatedProfile($oldProfile, new VotersEntity($this->payload))
+                                        ->runUpdate($this->payload['id'], $this->payload)
+                                        ->getById($this->payload['id']);
+
+        return $this->successResponse($currentProfile);
     }
 }

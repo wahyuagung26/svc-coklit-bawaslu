@@ -2,12 +2,11 @@
 
 namespace Core\Voters\Models;
 
+use Core\Voters\Entities\VotersEntity;
+
 class ProfileVotersModel extends BaseVotersModel
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private $isProfileUpdated;
     protected $allowedFields = [
         'm_district_id',
         'm_village_id',
@@ -22,5 +21,30 @@ class ProfileVotersModel extends BaseVotersModel
         'rt',
         'rw',
         'tps',
+        'is_profile_updated'
     ];
+
+    public function setStatusUpdatedProfile(VotersEntity $voterPreviousStatus, VotersEntity $voter)
+    {
+        $oldProfile = $voterPreviousStatus->toArray();
+        $newProfile = $voter->toArray(true);
+        $modifiedColumn = array_keys($newProfile);
+
+        $this->isProfileUpdated = false;
+        foreach ($modifiedColumn as $column) {
+            $issetData = isset($oldProfile[$column]) && isset($newProfile[$column]);
+            if ($issetData && $oldProfile[$column] != $newProfile[$column]) {
+                $this->isProfileUpdated = true;
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    public function runUpdate($id, array $data)
+    {
+        $this->update($id, array_merge($data, ['is_profile_updated' => $this->isProfileUpdated]));
+        return $this;
+    }
 }
