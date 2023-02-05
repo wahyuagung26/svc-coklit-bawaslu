@@ -3,6 +3,7 @@
 namespace Core\Voters\Models;
 
 use App\Models\CoreModel;
+use CodeIgniter\Database\RawSql;
 use Core\Voters\Entities\VotersEntity;
 
 class SaveRecapModel extends CoreModel
@@ -27,9 +28,87 @@ class SaveRecapModel extends CoreModel
         'voters_dpshp4_f',
     ];
 
+    protected $triggerUpdatedField = [
+        'm_villages_id' => null,
+        'gender' => null,
+        'tps' => STATUS_SUMMARY_TPS,
+        'disabilities' => STATUS_SUMMARY_DISABILITIES,
+        'is_ktp_el' => STATUS_SUMMARY_IS_KTP_EL,
+        'is_new_voter' => STATUS_SUMMARY_IS_NEW_VOTER,
+        'is_novice_voter' => STATUS_SUMMARY_IS_NOVICE_VOTER,
+        'is_profile_updated' => STATUS_SUMMARY_IS_PROFILE_UPDATED,
+        'tms' => [
+            STATUS_TMS_UNKNOWN => STATUS_SUMMARY_UNKNOWN,
+            STATUS_TMS_PASS_AWAY => STATUS_SUMMARY_PASS_AWAY,
+            STATUS_TMS_DOUBLE => STATUS_SUMMARY_DOUBLE,
+            STATUS_TMS_MINORS => STATUS_SUMMARY_MINORS,
+            STATUS_TMS_TNI => STATUS_SUMMARY_TNI,
+            STATUS_TMS_POLRI => STATUS_SUMMARY_POLRI
+        ]
+    ];
+
     public function setStatusDataTable(string $table)
     {
         $this->statusDataTable = $table;
         return $this;
+    }
+
+    public function updateRecap($payload)
+    {
+        $originalVoter = $this->getOriginalVoter($payload['id']);
+        return $this->run($originalVoter, $payload);
+    }
+
+    private function run($originalVoter, $payload)
+    {
+        foreach ($payload as $columnName => $value) {
+            $typeSummary = $this->triggerUpdatedField[$columnName] ?? STATUS_SUMMARY_TPS;
+
+            if (!isset($this->triggerUpdatedField[$columnName])) {
+                continue;
+            }
+
+            $this->increaseTotalSummary($payload, $typeSummary);
+
+            if ($originalVoter[$columnName] != $value) {
+                $this->decreaseTotalSummary($originalVoter, $typeSummary);
+            }
+        }
+    }
+
+    private function increaseTotalSummary($updatedVoter, $typeSummary)
+    {
+        $columnName = $updatedVoter['gender'] == GENDER_MALE ? "{$this->statusDataTable}_m" : "{$this->statusDataTable}_f";
+        $payload = [
+            "id" => "{$updatedVoter['m_villages_id']}-{$updatedVoter['tps']}-{$typeSummary}",
+            "m_villages_id" => $updatedVoter["m_villages_id"],
+            "tps" => $updatedVoter["tps"],
+            "type" => $typeSummary,
+            "$columnName" => new RawSql("IFNULL({$columnName}, 0)+1")
+        ];
+
+        return $this->upsert($payload);
+    }
+
+    private function decreaseTotalSummary($originalVoter, $typeSummary)
+    {
+        $columnName = $originalVoter['gender'] == GENDER_MALE ? "{$this->statusDataTable}_m" : "{$this->statusDataTable}_f";
+        $payload = [
+            "id" => "{$originalVoter['m_villages_id']}-{$originalVoter['tps']}-{$typeSummary}",
+            "m_villages_id" => $originalVoter["m_villages_id"],
+            "tps" => $originalVoter["tps"],
+            "type" => $typeSummary,
+            "$columnName" => new RawSql("{$columnName}-1")
+        ];
+
+        return $this->upsert($payload);
+    }
+
+    private function getOriginalVoter($voterId)
+    {
+        $model = new ProfileVotersModel();
+        $model->setActiveTable($this->statusDataTable);
+        
+        return $model->find($voterId);
     }
 }

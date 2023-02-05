@@ -45,6 +45,8 @@ abstract class BaseController extends Controller
 
     protected $payload;
 
+    protected $db;
+
     /**
      * Be sure to declare properties for any property fetch you initialized.
      * The creation of dynamic property is deprecated in PHP 8.2.
@@ -61,6 +63,9 @@ abstract class BaseController extends Controller
 
         // Preload any models, libraries, etc, here.
         $this->validation = \Config\Services::validation();
+
+        // Load db
+        $this->db = db_connect();
 
         if(!is_cli()) {
             $payload = array_merge($this->request->getGet() ?? [], $this->request->getJSON(true) ?? []);

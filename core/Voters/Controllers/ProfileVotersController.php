@@ -4,6 +4,7 @@ namespace Core\Voters\Controllers;
 
 use Core\Voters\Entities\VotersEntity;
 use Core\Voters\Models\ProfileVotersModel;
+use Core\Voters\Models\SaveRecapModel;
 
 class ProfileVotersController extends BaseVotersController
 {
@@ -72,21 +73,44 @@ class ProfileVotersController extends BaseVotersController
         $this->payload['m_districts_id'] = $this->payload['districts_id'];
         $this->payload['m_villages_id'] = $this->payload['villages_id'];
 
-        $statusData = $this->getStatusData($statusDataId);
+        try {
+            $this->db->transStart();
+            $statusData = $this->getStatusData($statusDataId);
 
+            $this->runRecapCounter($statusData);
+
+            $oldProfile = $this->getProfileFromPrevSource($statusData);
+            $currentProfile = $this->updateVoterProfile($statusData, $oldProfile);
+
+            $this->db->transComplete();
+
+            return $this->successResponse($currentProfile);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), HTTP_STATUS_SERVER_ERROR);
+        }
+    }
+
+    private function runRecapCounter($statusData)
+    {
+        $summaries = new SaveRecapModel();
+        return $summaries->setStatusDataTable($statusData->active_table_source)->updateRecap($this->payload);
+    }
+
+    private function getProfileFromPrevSource($statusData)
+    {
         /**
          * @todo Menambah kolom baru prev_voters_id pada semua tabel voters sebagai relasi ke data sebelumnya
          */
         $oldVoter = new ProfileVotersModel();
-        $oldProfile = $oldVoter->setActiveTable($statusData->prev_table_source)
-                                ->getById($this->payload['id']);
+        return $oldVoter->setActiveTable($statusData->prev_table_source)->getById($this->payload['id']);
+    }
 
+    private function updateVoterProfile($statusData, $oldProfile)
+    {
         $currentVoter = new ProfileVotersModel();
-        $currentProfile = $currentVoter->setActiveTable($statusData->active_table_source)
-                                        ->setStatusUpdatedProfile($oldProfile, new VotersEntity($this->payload))
-                                        ->runUpdate($this->payload['id'], $this->payload)
-                                        ->getById($this->payload['id']);
-
-        return $this->successResponse($currentProfile);
+        return $currentVoter->setActiveTable($statusData->active_table_source)
+                            ->setStatusUpdatedProfile($oldProfile, new VotersEntity($this->payload))
+                            ->runUpdate($this->payload['id'], $this->payload)
+                            ->getById($this->payload['id']);
     }
 }
