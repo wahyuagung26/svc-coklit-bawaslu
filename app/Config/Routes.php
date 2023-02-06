@@ -52,6 +52,10 @@ $routes->group('api', static function ($routes) {
         $routes->put('voters/(:any)/status', '\Core\Voters\Controllers\StatusVotersController::edit/$1');
         $routes->post('voters/(:any)', '\Core\Voters\Controllers\CreateVotersController::create/$1');
         $routes->get('voters/(:any)', '\Core\Voters\Controllers\GetVotersController::index/$1');
+
+        $routes->get('districts', '\Core\Regions\Controllers\RegionsController::getDistricts');
+        $routes->get('districts/(:any)/villages', '\Core\Regions\Controllers\RegionsController::getVillages/$1');
+        $routes->put('villages/(:any)/status/(:any)', '\Core\Regions\Controllers\SwitchStatusDataController::update/$1/$2');
     });
 });
 

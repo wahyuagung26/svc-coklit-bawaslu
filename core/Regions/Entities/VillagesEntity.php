@@ -11,12 +11,20 @@ class VillagesEntity extends Entity
 
     protected $attributes = [
         'id' => null,
-        'districts_id' => null,
+        'm_districts_id' => null,
         'village_name' => null,
+        'last_m_data_status_id' => null,
     ];
 
     protected $casts = [
         'id' => 'int',
-        'districts_id' => 'int'
+        'm_districts_id' => 'int',
+        'last_m_data_status_id' => 'int'
+    ];
+
+    protected $datamap = [
+        // property_name => db_column_name
+        'districts_id' => 'm_districts_id',
+        'last_data_status_id' => 'last_m_data_status_id'
     ];
 }
