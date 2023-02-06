@@ -25,9 +25,7 @@ trait ConvertEntityTrait
     private function checkIsEntity($entityClass)
     {
         $reflection = new ReflectionClass($entityClass);
-        $parent = $reflection->getParentClass()->name ?? '';
-
-        return $parent == 'CodeIgniter\Entity\Entity' && $reflection->getMethod('setAttributes');
+        return $reflection->getMethod('setAttributes');
     }
 
     private function convertSingleData($entityClass, &$data)

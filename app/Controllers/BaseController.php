@@ -67,7 +67,7 @@ abstract class BaseController extends Controller
         // Load db
         $this->db = db_connect();
 
-        if(!is_cli()) {
+        if (!is_cli()) {
             $payload = array_merge($this->request->getGet() ?? [], $this->request->getJSON(true) ?? []);
             $this->setPayload($payload);
         }
@@ -97,8 +97,8 @@ abstract class BaseController extends Controller
         return true;
     }
 
-    protected function user()
+    protected function user($key = null)
     {
-        return JwtAuth::user();
+        return JwtAuth::user($key);
     }
 }

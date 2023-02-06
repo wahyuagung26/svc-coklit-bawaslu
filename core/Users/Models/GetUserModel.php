@@ -20,15 +20,15 @@ class GetUserModel extends BaseUserModel
             'm_user.username',
             'm_user.password',
             'm_user.phone_number',
-            'm_user.m_districts_id as district_id',
+            'm_user.m_districts_id',
             'm_districts.district_name',
-            'm_user.m_villages_id as village_id',
+            'm_user.m_villages_id',
             'm_villages.village_name',
             'm_user.role',
             'm_user.last_login',
             'm_user.id token'
         ])->table('m_user')
-        ->join('m_districts', 'm_user.m_districts_id = m_districts.id')
+        ->join('m_districts', 'm_user.m_districts_id = m_districts.id', 'left')
         ->join('m_villages', 'm_user.m_villages_id = m_villages.id', 'left')
         ->where('m_user.is_deleted', 0);
 
@@ -49,13 +49,14 @@ class GetUserModel extends BaseUserModel
     public function getById(int $userId)
     {
         $user = $this->getUsers()->find($userId);
+
         return $this->convertEntity(UsersResponseEntity::class, $user);
     }
 
     public function setFilter($payload)
     {
         if (isset($payload['name'])) {
-            $this->like('m_villages.village_name', $payload['name']);
+            $this->like('m_user.name', $payload['name']);
         }
 
         return $this;

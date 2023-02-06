@@ -4,6 +4,7 @@ namespace Core\Users\Controllers;
 
 use App\Controllers\BaseController;
 use Core\Users\Models\AuthModel;
+use Core\Users\Models\GetUserModel;
 
 class AuthController extends BaseController
 {
@@ -31,5 +32,13 @@ class AuthController extends BaseController
 
     public function profile()
     {
+        $model = new GetUserModel();
+        $user = $model->getById($this->user('id') ?? 0);
+
+        if (isset($user->id)) {
+            return $this->successResponse($user);
+        }
+
+        return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
     }
 }

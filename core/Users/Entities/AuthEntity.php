@@ -3,29 +3,22 @@
 namespace Core\Users\Entities;
 
 use Firebase\JWT\JWT;
-use App\Traits\BaseEntityTrait;
-use CodeIgniter\Entity\Entity;
 
-class AuthEntity extends Entity
+class AuthEntity extends UsersEntity
 {
-    use BaseEntityTrait;
-
     protected $attributes = [
         'id' => null,
         'name' => null,
+        'username' => null,
         'phone_number' => null,
         'username' => null,
-        'district_id' => null,
+        'm_districts_id' => null,
         'district_name' => null,
-        'village_id' => null,
+        'm_villages_id' => null,
         'village_name' => null,
         'role' => null,
         'last_login' => null,
         'token' => null,
-    ];
-
-    protected $casts = [
-        'id' => 'int'
     ];
 
     public function setToken($token)
@@ -42,5 +35,10 @@ class AuthEntity extends Entity
 
         $token = JWT::encode($payload, getenv('JWT_SECRET'), getenv('JWT_ALGO'));
         $this->attributes['token'] = $token;
+    }
+
+    public function setPassword($password)
+    {
+        $this->attributes['password'] = '';
     }
 }

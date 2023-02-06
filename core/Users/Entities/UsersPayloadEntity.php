@@ -2,15 +2,8 @@
 
 namespace Core\Users\Entities;
 
-use App\Traits\BaseEntityTrait;
-use CodeIgniter\Entity\Entity;
-
-class UsersPayloadEntity extends Entity
+class UsersPayloadEntity extends UsersEntity
 {
-    use BaseEntityTrait;
-
-    public static $attributesName;
-
     protected $attributes = [
         'id' => null,
         'name' => null,
@@ -27,21 +20,4 @@ class UsersPayloadEntity extends Entity
         'created_at' => null,
         'created_by' => null
     ];
-
-    protected $casts = [
-        'id' => 'int'
-    ];
-
-    public function setPassword($password)
-    {
-        if (empty($password)) {
-            return null;
-        }
-
-        $this->attributes['password'] = password_hash($password, PASSWORD_BCRYPT);
-    }
-
-    public function setIsDeleted($isDeleted) {
-        $this->attributes['is_deleted'] = empty($isDeleted) ? 0 : $isDeleted;
-    }
 }

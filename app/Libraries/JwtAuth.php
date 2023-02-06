@@ -14,7 +14,7 @@ class JwtAuth
         JwtAuth::$userId = $userId;
     }
 
-    public static function user()
+    public static function user($key = null)
     {
         $userId = JwtAuth::$userId ?? '';
         if (empty($userId)) {
@@ -26,6 +26,11 @@ class JwtAuth
             JwtAuth::$user = $userModel->getById($userId);
         }
 
-        return JwtAuth::$user;
+        $user = JwtAuth::$user->toArray();
+        if (!empty($key)) {
+            return $user[$key] ?? '';
+        }
+
+        return $user;
     }
 }

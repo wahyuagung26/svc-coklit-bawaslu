@@ -15,7 +15,7 @@ class CoreModel extends Model
     protected function setDefaultInsertData(array $data)
     {
         $data['data']['created_at'] = date('Y-m-d H:i:s');
-        $data['data']['created_by'] = JwtAuth::user()['id'] ?? 1;
+        $data['data']['created_by'] = JwtAuth::user('id') ?? 1;
 
         if (isset($data['data']['id'])) {
             unset($data['data']['id']);
@@ -28,7 +28,7 @@ class CoreModel extends Model
     protected function setDefaultUpdateData(array $data)
     {
         $data['data']['updated_at'] = date('Y-m-d H:i:s');
-        $data['data']['updated_by'] = JwtAuth::user()['id'] ?? 1;
+        $data['data']['updated_by'] = JwtAuth::user('id') ?? 1;
 
         return $data;
     }

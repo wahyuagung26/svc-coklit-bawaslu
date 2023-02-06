@@ -29,11 +29,15 @@ class ManageUserController extends BaseController
             'label' => 'Password',
             'rules' => 'required'
         ],
+        'phone_number' => [
+            'label' => 'Nomor Telepon',
+            'rules' => 'numeric|max_length[18]'
+        ],
         'role' => [
             'label' => 'Hak Akses',
             'rules' => 'required'
         ],
-        'm_districts_id' => [
+        'districts_id' => [
             'label' => 'Kecamatan',
             'rules' => 'required'
         ]
@@ -52,10 +56,14 @@ class ManageUserController extends BaseController
             'label' => 'Hak Akses',
             'rules' => 'required'
         ],
-        'm_districts_id' => [
+        'districts_id' => [
             'label' => 'Kecamatan',
             'rules' => 'required'
-        ]
+        ],
+        'phone_number' => [
+            'label' => 'Nomor Telepon',
+            'rules' => 'numeric|max_length[18]'
+        ],
     ];
 
     public function create()
@@ -64,7 +72,11 @@ class ManageUserController extends BaseController
         $this->checkIsUserAlreadyRegistered($this->payload['username'] ?? '');
 
         $user = new UsersPayloadEntity($this->payload);
-        $model = $this->user->insert($user->toArray(true));
+        $payload = $user->toArray(true);
+        $payload['m_districts_id'] = $this->payload['districts_id'] ?? null;
+        $payload['m_villages_id'] = $this->payload['villages_id'] ?? null;
+
+        $model = $this->user->insert($payload);
 
         return $this->successResponse($model);
     }
@@ -76,7 +88,11 @@ class ManageUserController extends BaseController
         $this->checkIsUserAlreadyRegistered($this->payload['username'], $this->payload['id']);
 
         $user = new UsersPayloadEntity($this->payload);
-        $model = $this->user->update($this->payload['id'], $user->toArray(true));
+        $payload = $user->toArray(true);
+        $payload['m_districts_id'] = $this->payload['districts_id'] ?? null;
+        $payload['m_villages_id'] = $this->payload['villages_id'] ?? null;
+
+        $model = $this->user->update($payload['id'], $payload);
 
         return $this->successResponse($model);
     }

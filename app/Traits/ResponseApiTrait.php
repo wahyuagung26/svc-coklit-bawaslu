@@ -29,7 +29,7 @@ trait ResponseApiTrait
     {
         $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
-            'error' => &$error
+            'errors' => &$error
         ])->send();
 
         exit;
@@ -38,7 +38,8 @@ trait ResponseApiTrait
     public function errorResponse($message = '', int $statusCode = HTTP_STATUS_SERVER_ERROR)
     {
         $this->response->setStatusCode($statusCode)->setJson([
-            'message' => $message
+            'message' => $message,
+            'errors' => $message
         ])
         ->send();
 
