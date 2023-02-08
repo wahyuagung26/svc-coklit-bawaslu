@@ -26,6 +26,7 @@ class VotersEntity extends Entity
         'rt' => null,
         'rw' => null,
         'tps' => null,
+        'tms' => null,
         'disabilities' => null,
         'is_coklit' => null,
         'is_ktp_el' => null,
@@ -39,8 +40,6 @@ class VotersEntity extends Entity
 
     protected $casts = [
         'id' => 'int',
-        'married_status' => 'int',
-        'gender' => 'int',
         'tps' => 'int',
         'is_coklit' => 'bool',
         'is_ktp_el' => 'bool',
@@ -51,4 +50,16 @@ class VotersEntity extends Entity
         'is_deleted' => 'bool',
         'is_new_data' => 'bool',
     ];
+
+    public function setGender($gender)
+    {
+        $master = [1 => 'Laki-Laki', 2 => 'Perempuan'];
+        $this->attributes['gender'] = $master[$gender] ?? '-';
+    }
+
+    public function setMarriedStatus($married)
+    {
+        $master = [1 => 'Belum Kawin', 2 => 'Sudah Kawin'];
+        $this->attributes['married_status'] = $master[$married] ?? '-';
+    }
 }

@@ -24,7 +24,7 @@ class VillagesEntity extends Entity
 
     protected $datamap = [
         // property_name => db_column_name
-        'districts_id' => 'm_districts_id',
+        'district_id' => 'm_districts_id',
         'last_data_status_id' => 'last_m_data_status_id'
     ];
 }

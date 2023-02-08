@@ -37,7 +37,7 @@ class ManageUserController extends BaseController
             'label' => 'Hak Akses',
             'rules' => 'required'
         ],
-        'districts_id' => [
+        'district_id' => [
             'label' => 'Kecamatan',
             'rules' => 'required'
         ]
@@ -56,7 +56,7 @@ class ManageUserController extends BaseController
             'label' => 'Hak Akses',
             'rules' => 'required'
         ],
-        'districts_id' => [
+        'district_id' => [
             'label' => 'Kecamatan',
             'rules' => 'required'
         ],
@@ -73,8 +73,8 @@ class ManageUserController extends BaseController
 
         $user = new UsersPayloadEntity($this->payload);
         $payload = $user->toArray(true);
-        $payload['m_districts_id'] = $this->payload['districts_id'] ?? null;
-        $payload['m_villages_id'] = $this->payload['villages_id'] ?? null;
+        $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
+        $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
 
         $model = $this->user->insert($payload);
 
@@ -89,12 +89,20 @@ class ManageUserController extends BaseController
 
         $user = new UsersPayloadEntity($this->payload);
         $payload = $user->toArray(true);
-        $payload['m_districts_id'] = $this->payload['districts_id'] ?? null;
-        $payload['m_villages_id'] = $this->payload['villages_id'] ?? null;
+        $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
+        $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
 
         $model = $this->user->update($payload['id'], $payload);
 
         return $this->successResponse($model);
+    }
+
+    public function delete($userId) {
+        $this->checkIsUserExists($userId);
+
+        $user = $this->user->delete($userId);
+
+        return $this->successResponse($user);
     }
 
     private function checkIsUserAlreadyRegistered($username, $exceptionId = null)
@@ -117,5 +125,7 @@ class ManageUserController extends BaseController
         if (!isset($user->id)) {
             return $this->errorResponse('user not found', HTTP_STATUS_UNPROCESS);
         }
+
+        return true;
     }
 }

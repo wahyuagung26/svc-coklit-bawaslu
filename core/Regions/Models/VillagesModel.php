@@ -27,6 +27,7 @@ class VillagesModel extends CoreModel
     {
         $villages = $this->where('m_districts_id', $districtId)
                         ->where('is_deleted', 0)
+                        ->orderBy('village_name', 'ASC')
                         ->find();
                         
         return $this->convertEntity(VillagesEntity::class, $villages);

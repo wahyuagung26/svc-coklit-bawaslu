@@ -21,11 +21,14 @@ class GetVotersController extends BaseVotersController
 
     public function coklitSummary($statusDataId, $villageId)
     {
-        $village = $this->getVillage($villageId);
+        if ($villageId > 0) {
+            $village = $this->getVillage($villageId);
+        }
+
         $statusData = $this->getStatusData($statusDataId);
 
         $model = new CoklitSummaryModel();
-        $model->setActiveTable($statusData->active_table_source)->setVillageId($village->id);
+        $model->setActiveTable($statusData->active_table_source)->setVillageId($village->id ?? 0);
 
         return $this->successResponse([
             'total_coklit' => $model->getTotalCoklit(),

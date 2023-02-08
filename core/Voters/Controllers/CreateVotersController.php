@@ -7,11 +7,11 @@ use Core\Voters\Models\CreateVotersModel;
 class CreateVotersController extends BaseVotersController
 {
     private $createRule = [
-        'districts_id' => [
+        'district_id' => [
             'label' => 'Kode Kecamatan',
             'rules' => 'required|max_length[8]'
         ],
-        'villages_id' => [
+        'village_id' => [
             'label' => 'Kode Desa / Kelurahan',
             'rules' => 'required|max_length[12]'
         ],
@@ -64,8 +64,8 @@ class CreateVotersController extends BaseVotersController
     public function create($statusDataId)
     {
         $this->runPayloadValidation($this->createRule, $this->payload);
-        $this->payload['m_districts_id'] = $this->payload['districts_id'];
-        $this->payload['m_villages_id'] = $this->payload['villages_id'];
+        $this->payload['m_districts_id'] = $this->payload['district_id'];
+        $this->payload['m_villages_id'] = $this->payload['village_id'];
         $this->payload['is_new_data'] = 1;
 
         $statusData = $this->getStatusData($statusDataId);

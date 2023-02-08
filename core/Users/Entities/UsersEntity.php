@@ -18,6 +18,8 @@ class UsersEntity extends Entity
         'role' => null,
         'm_districts_id' => null,
         'm_villages_id' => null,
+        'district_name' => null,
+        'village_name' => null,
         'last_login' => null,
         'is_deleted' => null,
         'updated_at' => null,
@@ -32,8 +34,8 @@ class UsersEntity extends Entity
 
     protected $datamap = [
         // property_name => db_column_name
-        'districts_id' => 'm_districts_id',
-        'villages_id' => 'm_villages_id'
+        'district_id' => 'm_districts_id',
+        'village_id' => 'm_villages_id',
     ];
 
     public function setPassword($password)

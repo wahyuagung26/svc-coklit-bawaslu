@@ -46,6 +46,7 @@ $routes->group('api', static function ($routes) {
         $routes->post('users', '\Core\Users\Controllers\ManageUserController::create');
         $routes->put('users', '\Core\Users\Controllers\ManageUserController::update');
         $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
+        $routes->delete('users/(:any)', '\Core\Users\Controllers\ManageUserController::delete/$1');
 
         $routes->post('voters/(:any)/generate/(:any)', '\Core\Voters\Controllers\GenerateController::generate/$1/$2');
         $routes->get('voters/(:any)/coklit/(:any)', '\Core\Voters\Controllers\GetVotersController::coklitSummary/$1/$2');

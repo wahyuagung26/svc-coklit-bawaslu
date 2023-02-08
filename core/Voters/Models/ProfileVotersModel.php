@@ -24,10 +24,10 @@ class ProfileVotersModel extends BaseVotersModel
         'is_profile_updated'
     ];
 
-    public function setStatusUpdatedProfile(VotersEntity $voterPreviousStatus, VotersEntity $voter)
+    public function setStatusUpdatedProfile(VotersEntity $voterPreviousStatus, array $payload)
     {
         $oldProfile = $voterPreviousStatus->toArray();
-        $newProfile = $voter->toArray(true);
+        $newProfile = $payload;
         $modifiedColumn = array_keys($newProfile);
 
         $this->isProfileUpdated = false;

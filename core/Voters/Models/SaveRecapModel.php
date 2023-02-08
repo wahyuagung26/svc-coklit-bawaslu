@@ -74,6 +74,8 @@ class SaveRecapModel extends CoreModel
                 $this->decreaseTotalSummary($originalVoter, $typeSummary);
             }
         }
+
+        return true;
     }
 
     private function increaseTotalSummary($updatedVoter, $typeSummary)
