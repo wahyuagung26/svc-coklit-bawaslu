@@ -28,4 +28,10 @@ class CreateVotersModel extends BaseVotersModel
         'is_new_data',
         'is_checked'
     ];
+
+    public function getLastInsert()
+    {
+        $id = $this->getInsertId();
+        return $this->getById($id);
+    }
 }

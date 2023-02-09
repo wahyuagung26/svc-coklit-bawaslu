@@ -4,7 +4,6 @@ namespace Core\Voters\Models;
 
 use App\Models\CoreModel;
 use CodeIgniter\Database\RawSql;
-use Core\Voters\Entities\VotersEntity;
 
 class SaveRecapModel extends CoreModel
 {
@@ -78,13 +77,15 @@ class SaveRecapModel extends CoreModel
         return true;
     }
 
-    private function increaseTotalSummary($updatedVoter, $typeSummary)
+    private function increaseTotalSummary($voter, $typeSummary)
     {
-        $columnName = $updatedVoter['gender'] == GENDER_MALE ? "{$this->statusDataTable}_m" : "{$this->statusDataTable}_f";
+        $maleColumn = "{$this->statusDataTable}_m";
+        $femaleColumn = "{$this->statusDataTable}_f";
+        $columnName = $voter['gender'] == GENDER_MALE ? $maleColumn : $femaleColumn;
         $payload = [
-            "id" => "{$updatedVoter['m_villages_id']}-{$updatedVoter['tps']}-{$typeSummary}",
-            "m_villages_id" => $updatedVoter["m_villages_id"],
-            "tps" => $updatedVoter["tps"],
+            "id" => "{$voter['m_villages_id']}-{$voter['tps']}-{$typeSummary}",
+            "m_villages_id" => $voter["m_villages_id"],
+            "tps" => $voter["tps"],
             "type" => $typeSummary,
             "$columnName" => new RawSql("IFNULL({$columnName}, 0)+1")
         ];
@@ -92,13 +93,15 @@ class SaveRecapModel extends CoreModel
         return $this->upsert($payload);
     }
 
-    private function decreaseTotalSummary($originalVoter, $typeSummary)
+    private function decreaseTotalSummary($voter, $typeSummary)
     {
-        $columnName = $originalVoter['gender'] == GENDER_MALE ? "{$this->statusDataTable}_m" : "{$this->statusDataTable}_f";
+        $maleColumn = "{$this->statusDataTable}_m";
+        $femaleColumn = "{$this->statusDataTable}_f";
+        $columnName = $voter['gender'] == GENDER_MALE ? $maleColumn : $femaleColumn;
         $payload = [
-            "id" => "{$originalVoter['m_villages_id']}-{$originalVoter['tps']}-{$typeSummary}",
-            "m_villages_id" => $originalVoter["m_villages_id"],
-            "tps" => $originalVoter["tps"],
+            "id" => "{$voter['m_villages_id']}-{$voter['tps']}-{$typeSummary}",
+            "m_villages_id" => $voter["m_villages_id"],
+            "tps" => $voter["tps"],
             "type" => $typeSummary,
             "$columnName" => new RawSql("{$columnName}-1")
         ];
@@ -110,7 +113,7 @@ class SaveRecapModel extends CoreModel
     {
         $model = new ProfileVotersModel();
         $model->setActiveTable($this->statusDataTable);
-        
+
         return $model->find($voterId);
     }
 }

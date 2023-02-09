@@ -12,11 +12,14 @@ trait ConvertEntityTrait
             return null;
         }
 
-        if ($this->checkIsEntity($entityClass)) {
-            if (isset($data[0])) {
-                return $this->convertMultipleData($entityClass, $data);
-            }
-            return $this->convertSingleData($entityClass, $data);
+        if (!$this->checkIsEntity($entityClass)) {
+            return $data;
+        }
+
+        if (isset($data[0])) {
+            $data = $this->convertMultipleData($entityClass, $data);
+        } else {
+            $data = $this->convertSingleData($entityClass, $data);
         }
 
         return $data;

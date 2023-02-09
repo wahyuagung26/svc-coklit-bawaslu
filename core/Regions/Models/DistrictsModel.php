@@ -24,7 +24,8 @@ class DistrictsModel extends CoreModel
 
     public function getAll()
     {
-        return $this->convertEntity(DistrictsEntity::class, $this->where('is_deleted', 0)->orderBy('district_name', 'ASC')->find());
+        $districts = $this->where('is_deleted', 0)->orderBy('district_name', 'ASC')->find();
+        return $this->convertEntity(DistrictsEntity::class, $districts);
     }
 
     public function setId($id)

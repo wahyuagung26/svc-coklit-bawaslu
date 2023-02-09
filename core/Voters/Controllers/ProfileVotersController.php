@@ -2,12 +2,14 @@
 
 namespace Core\Voters\Controllers;
 
-use Core\Voters\Entities\VotersEntity;
+use App\Exceptions\ValidationException;
 use Core\Voters\Models\ProfileVotersModel;
-use Core\Voters\Models\SaveRecapModel;
 
 class ProfileVotersController extends BaseVotersController
 {
+    private $payload;
+    private $oldProfile;
+    private $statusData;
     private $profileVoterRule = [
         'id' => [
             'label' => 'ID Pemilih',
@@ -29,42 +31,46 @@ class ProfileVotersController extends BaseVotersController
 
         try {
             $this->db->transStart();
-            $statusData = $this->getStatusData($statusDataId);
+            $this->statusData = $this->getStatusData($statusDataId);
 
-            $this->runRecapCounter($statusData);
+            $profile = $this->getProfileFromPrevSource()->updateVoterProfile();
 
-            $oldProfile = $this->getProfileFromPrevSource($statusData);
-            $currentProfile = $this->updateVoterProfile($statusData, $oldProfile);
+            $this->db->transCommit();
 
-            $this->db->transComplete();
-
-            return $this->successResponse($currentProfile);
+            return $this->successResponse($profile);
+        } catch (ValidationException $th) {
+            $this->db->transRollback();
+            return $this->failedValidationResponse([], $th->getMessage(), $th->getCode());
         } catch (\Throwable $th) {
-            return $this->errorResponse($th->getMessage(), HTTP_STATUS_SERVER_ERROR);
+            $this->db->transRollback();
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
     }
 
-    private function runRecapCounter($statusData)
-    {
-        $summaries = new SaveRecapModel();
-        return $summaries->setStatusDataTable($statusData->active_table_source)->updateRecap($this->payload);
-    }
-
-    private function getProfileFromPrevSource($statusData)
+    private function getProfileFromPrevSource()
     {
         /**
          * @todo Menambah kolom baru prev_voters_id pada semua tabel voters sebagai relasi ke data sebelumnya
          */
-        $oldVoter = new ProfileVotersModel();
-        return $oldVoter->setActiveTable($statusData->prev_table_source)->getById($this->payload['id']);
+        $voter = new ProfileVotersModel();
+        $voterId = $this->payload['id'];
+        $previousTableName = $this->statusData->prev_table_source;
+
+        $this->oldProfile = $voter->setActiveTable($previousTableName)->getById($voterId);
+        return $this;
     }
 
-    private function updateVoterProfile($statusData, $oldProfile)
+    private function updateVoterProfile()
     {
-        $currentVoter = new ProfileVotersModel();
-        return $currentVoter->setActiveTable($statusData->active_table_source)
-                            ->setStatusUpdatedProfile($oldProfile, $this->payload)
-                            ->runUpdate($this->payload['id'], $this->payload)
-                            ->getById($this->payload['id']);
+        $voter = new ProfileVotersModel();
+        $voterOldProfile = $this->oldProfile->toArray();
+        $activeTableName = $this->statusData->active_table_source;
+
+        return $voter->setActiveTable($activeTableName)
+                        ->setOldProfile($voterOldProfile)
+                        ->setNewProfile($this->payload)
+                        ->setStatusUpdatedProfile()
+                        ->runUpdate()
+                        ->getById($this->payload['id']);
     }
 }

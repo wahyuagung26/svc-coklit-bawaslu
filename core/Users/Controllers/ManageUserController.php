@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use Core\Users\Entities\UsersPayloadEntity;
 use Core\Users\Models\GetUserModel;
 use Core\Users\Models\ManageUserModel;
+use Throwable;
 
 class ManageUserController extends BaseController
 {
@@ -68,45 +69,56 @@ class ManageUserController extends BaseController
 
     public function create()
     {
-        $this->runPayloadValidation($this->createRule, $this->payload);
-        $this->checkIsUserAlreadyRegistered($this->payload['username'] ?? '');
+        try {
+            $this->runPayloadValidation($this->createRule, $this->payload)
+                ->checkIsUserAlreadyRegistered();
 
-        $user = new UsersPayloadEntity($this->payload);
-        $payload = $user->toArray(true);
-        $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
-        $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
+            $user = new UsersPayloadEntity($this->payload);
+            $payload = $user->toArray(true);
+            $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
+            $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
 
-        $model = $this->user->insert($payload);
-
-        return $this->successResponse($model);
+            $user = $this->user->insert($payload)->getLastInsert();
+            return $this->successResponse($user);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
     }
 
     public function update()
     {
-        $this->runPayloadValidation($this->updateRule, $this->payload);
-        $this->checkIsUserExists($this->payload['id']);
-        $this->checkIsUserAlreadyRegistered($this->payload['username'], $this->payload['id']);
+        try {
+            $this->runPayloadValidation($this->updateRule, $this->payload)
+                ->checkIsUserExists()
+                ->checkIsUserAlreadyRegistered($this->payload['id']);
 
-        $user = new UsersPayloadEntity($this->payload);
-        $payload = $user->toArray(true);
-        $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
-        $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
+            $user = new UsersPayloadEntity($this->payload);
+            $payload = $user->toArray(true);
+            $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
+            $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
 
-        $model = $this->user->update($payload['id'], $payload);
-
-        return $this->successResponse($model);
+            $this->user->update($payload['id'], $payload);
+            return $this->successResponse($this->user->getById($payload['id']));
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
     }
 
-    public function delete($userId) {
-        $this->checkIsUserExists($userId);
-
-        $user = $this->user->delete($userId);
-
-        return $this->successResponse($user);
-    }
-
-    private function checkIsUserAlreadyRegistered($username, $exceptionId = null)
+    public function delete($userId)
     {
+        try {
+            $this->checkIsUserExists($userId);
+
+            $user = $this->user->delete($userId);
+            return $this->successResponse($user);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
+    }
+
+    private function checkIsUserAlreadyRegistered($exceptionId = null)
+    {
+        $username = $this->payload['username'] ?? null;
         $model = new GetUserModel();
         $user = $model->getByUsername($username, $exceptionId);
 
@@ -114,11 +126,12 @@ class ManageUserController extends BaseController
             return $this->errorResponse('username already registered', HTTP_STATUS_UNPROCESS);
         }
 
-        return true;
+        return $this;
     }
 
-    private function checkIsUserExists($userId)
+    private function checkIsUserExists()
     {
+        $userId = $this->payload['id'] ?? null;
         $model = new GetUserModel();
         $user = $model->getById($userId);
 
@@ -126,6 +139,6 @@ class ManageUserController extends BaseController
             return $this->errorResponse('user not found', HTTP_STATUS_UNPROCESS);
         }
 
-        return true;
+        return $this;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Core\Voters\Models;
 
+use App\Exceptions\ValidationException;
 use Exception;
 
 class GenerateModel extends BaseVotersModel
@@ -40,15 +41,15 @@ class GenerateModel extends BaseVotersModel
     private function runValidationMandatory()
     {
         if (empty($this->table)) {
-            throw new Exception("tabel data pemilih yang baru tidak ditemukan", HTTP_STATUS_UNPROCESS);
+            throw new ValidationException("tabel data pemilih yang baru tidak ditemukan", HTTP_STATUS_UNPROCESS);
         }
 
         if (empty($this->sourceTable)) {
-            throw new Exception("tabel sumber data tidak ditemukan", HTTP_STATUS_UNPROCESS);
+            throw new ValidationException("tabel sumber data tidak ditemukan", HTTP_STATUS_UNPROCESS);
         }
 
         if (empty($this->villageId)) {
-            throw new Exception("desa / kelurahan tidak ditemukan", HTTP_STATUS_UNPROCESS);
+            throw new ValidationException("desa / kelurahan tidak ditemukan", HTTP_STATUS_UNPROCESS);
         }
 
         return $this;

@@ -6,11 +6,6 @@ use Core\Voters\Entities\VotersEntity;
 
 class GetVotersModel extends BaseVotersModel
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     protected $table = "voters_pra_dps";
 
     public function getAll()

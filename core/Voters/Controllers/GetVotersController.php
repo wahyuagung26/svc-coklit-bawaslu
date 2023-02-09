@@ -10,36 +10,46 @@ class GetVotersController extends BaseVotersController
 {
     public function index($statusDataId)
     {
-        $payload = $this->getPayload();
-        $payload['page'] = $payload['page'] ?? 1;
+        try {
+            $payload = $this->getPayload();
+            $payload['page'] = $payload['page'] ?? 1;
 
-        $statusData = $this->getStatusData($statusDataId);
-        $voters = $this->getDataByStatus($payload, $statusData);
+            $statusData = $this->getStatusData($statusDataId);
+            $voters = $this->getDataByStatus($payload, $statusData);
 
-        return $this->paginationResponse($voters['data'] ?? [], $voters['meta'] ?? []);
+            return $this->paginationResponse($voters['data'] ?? [], $voters['meta'] ?? []);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
     }
 
     public function coklitSummary($statusDataId, $villageId)
     {
-        if ($villageId > 0) {
-            $village = $this->getVillage($villageId);
+        try {
+            if ($villageId > 0) {
+                $village = $this->getVillageById($villageId);
+            }
+
+            $statusData = $this->getStatusData($statusDataId);
+
+            $model = new CoklitSummaryModel();
+            $model->setActiveTable($statusData->active_table_source)->setVillageId($village->id ?? 0);
+
+            return $this->successResponse([
+                'total_coklit' => $model->getTotalCoklit(),
+                'total_uncoklit' => $model->getTotalUnCoklit()
+            ]);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
-
-        $statusData = $this->getStatusData($statusDataId);
-
-        $model = new CoklitSummaryModel();
-        $model->setActiveTable($statusData->active_table_source)->setVillageId($village->id ?? 0);
-
-        return $this->successResponse([
-            'total_coklit' => $model->getTotalCoklit(),
-            'total_uncoklit' => $model->getTotalUnCoklit()
-        ]);
     }
 
     private function getDataByStatus(array $payload, StatusDataEntity $statusData)
     {
         $model = new GetVotersModel();
-        return $model->setActiveTable($statusData->active_table_source)
+        $tableName = $statusData->active_table_source;
+
+        return $model->setActiveTable($tableName)
                         ->getAll()
                         ->setFilter($payload)
                         ->pagination($payload['page']);

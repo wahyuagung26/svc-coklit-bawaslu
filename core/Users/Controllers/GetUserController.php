@@ -16,24 +16,32 @@ class GetUserController extends BaseController
 
     public function index()
     {
-        $payload = $this->getPayload();
-        $payload['page'] = $payload['page'] ?? 1;
+        try {
+            $payload = $this->getPayload();
+            $payload['page'] = $payload['page'] ?? 1;
 
-        $users = $this->user->getUsers()
-                            ->setFilter($payload)
-                            ->pagination($payload['page']);
+            $users = $this->user->getUsers()
+                                ->setFilter($payload)
+                                ->pagination($payload['page']);
 
-        return $this->paginationResponse($users['data'], $users['meta']);
+            return $this->paginationResponse($users['data'], $users['meta']);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
     }
 
     public function getById($userId)
     {
-        $user = $this->user->getById($userId);
+        try {
+            $user = $this->user->getById($userId);
 
-        if (isset($user->id)) {
-            return $this->successResponse($user);
+            if (isset($user->id)) {
+                return $this->successResponse($user);
+            }
+
+            return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
-
-        return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
     }
 }

@@ -12,6 +12,7 @@ class BaseVotersController extends BaseController
     {
         $statusModel = new GetStatusModel();
         $status = $statusModel->getById($statusDataId);
+
         if (!$status) {
             return $this->errorResponse('status data pemilih tidak ditemukan', HTTP_STATUS_NOT_FOUND);
         }
@@ -19,7 +20,7 @@ class BaseVotersController extends BaseController
         return $status;
     }
 
-    protected function getVillage($villageId)
+    protected function getVillageById($villageId)
     {
         $villageModel = new VillagesModel();
         $village = $villageModel->getById($villageId);

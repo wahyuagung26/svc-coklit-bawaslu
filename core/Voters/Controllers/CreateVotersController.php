@@ -6,7 +6,7 @@ use Core\Voters\Models\CreateVotersModel;
 
 class CreateVotersController extends BaseVotersController
 {
-    private $createRule = [
+    private $rule = [
         'district_id' => [
             'label' => 'Kode Kecamatan',
             'rules' => 'required|max_length[8]'
@@ -63,17 +63,23 @@ class CreateVotersController extends BaseVotersController
 
     public function create($statusDataId)
     {
-        $this->runPayloadValidation($this->createRule, $this->payload);
-        $this->payload['m_districts_id'] = $this->payload['district_id'];
-        $this->payload['m_villages_id'] = $this->payload['village_id'];
-        $this->payload['is_new_data'] = 1;
+        try {
+            $this->runPayloadValidation($this->rule, $this->payload);
+            $this->payload['m_districts_id'] = $this->payload['district_id'];
+            $this->payload['m_villages_id'] = $this->payload['village_id'];
+            $this->payload['is_new_data'] = 1;
 
-        $statusData = $this->getStatusData($statusDataId);
+            $statusData = $this->getStatusData($statusDataId);
+            $tableName = $statusData->active_table_source;
 
-        $model = new CreateVotersModel();
-        $model->setActiveTable($statusData->active_table_source)->insert($this->payload);
+            $model = new CreateVotersModel();
+            $voter = $model->setActiveTable($tableName)
+                        ->insert($this->payload)
+                        ->getLastInsert();
 
-        $voter = $model->getById($model->getInsertId());
-        return $this->successResponse($voter);
+            return $this->successResponse($voter);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
     }
 }

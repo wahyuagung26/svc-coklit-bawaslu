@@ -2,7 +2,6 @@
 
 namespace Core\Regions\Controllers;
 
-use App\Controllers\BaseController;
 use Core\Regions\Models\VillagesModel;
 use Core\StatusData\Models\GetStatusModel;
 
@@ -12,7 +11,7 @@ class SwitchStatusDataController extends BaseRegionsController
     {
         try {
             $statusData = $this->getStatusData($statusDataId);
-            $village = $this->getVillage($villageId);
+            $village = $this->getVillageById($villageId);
 
             $newStatusDataId = $statusData->id + 1;
             $this->getStatusData($newStatusDataId);

@@ -15,30 +15,38 @@ class AuthController extends BaseController
 
     public function login()
     {
-        $this->runPayloadValidation($this->loginRule, $this->payload);
+        try {
+            $this->runPayloadValidation($this->loginRule, $this->payload);
 
-        $model = new AuthModel();
-        $user = $model->login($this->payload['username'] ?? '', $this->payload['password'] ?? '');
+            $model = new AuthModel();
+            $user = $model->login($this->payload['username'] ?? '', $this->payload['password'] ?? '');
 
-        if (isset($user->id)) {
-            $user->last_login = date('Y-m-d H:i:s');
-            $model->save($user);
+            if (isset($user->id)) {
+                $user->last_login = date('Y-m-d H:i:s');
+                $model->save($user);
 
-            return $this->successResponse($user);
+                return $this->successResponse($user);
+            }
+
+            return $this->failedValidationResponse(['Username or password is wrong']);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
-
-        return $this->failedValidationResponse(['Username or password is wrong']);
     }
 
     public function profile()
     {
-        $model = new GetUserModel();
-        $user = $model->getById($this->user('id') ?? 0);
+        try {
+            $model = new GetUserModel();
+            $user = $model->getById($this->user('id') ?? 0);
 
-        if (isset($user->id)) {
-            return $this->successResponse($user);
+            if (isset($user->id)) {
+                return $this->successResponse($user);
+            }
+
+            return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
-
-        return $this->successResponse(null, 'user not found', HTTP_STATUS_NOT_FOUND);
     }
 }

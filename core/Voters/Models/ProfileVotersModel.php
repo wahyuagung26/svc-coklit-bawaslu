@@ -2,10 +2,12 @@
 
 namespace Core\Voters\Models;
 
-use Core\Voters\Entities\VotersEntity;
+use App\Exceptions\ValidationException;
 
 class ProfileVotersModel extends BaseVotersModel
 {
+    private $oldProfile;
+    private $newProfile;
     private $isProfileUpdated;
     protected $allowedFields = [
         'm_district_id',
@@ -24,10 +26,10 @@ class ProfileVotersModel extends BaseVotersModel
         'is_profile_updated'
     ];
 
-    public function setStatusUpdatedProfile(VotersEntity $voterPreviousStatus, array $payload)
+    public function setStatusUpdatedProfile()
     {
-        $oldProfile = $voterPreviousStatus->toArray();
-        $newProfile = $payload;
+        $oldProfile = $this->oldProfile;
+        $newProfile = $this->newProfile;
         $modifiedColumn = array_keys($newProfile);
 
         $this->isProfileUpdated = false;
@@ -42,9 +44,31 @@ class ProfileVotersModel extends BaseVotersModel
         return $this;
     }
 
-    public function runUpdate($id, array $data)
+    public function runUpdate()
     {
-        $this->update($id, array_merge($data, ['is_profile_updated' => $this->isProfileUpdated]));
+        $id = $this->newProfile['id'] ?? null;
+
+        if (empty($id)) {
+            throw new ValidationException('Id tidak boleh kosong', HTTP_STATUS_UNPROCESS);
+        }
+
+        if (empty($this->newProfile)) {
+            throw new ValidationException('Data baru tidak boleh kosong', HTTP_STATUS_UNPROCESS);
+        }
+
+        $this->update($id, array_merge($this->newProfile, ['is_profile_updated' => $this->isProfileUpdated]));
+        return $this;
+    }
+
+    public function setOldProfile(array $profile)
+    {
+        $this->oldProfile = $profile;
+        return $this;
+    }
+
+    public function setNewProfile(array $profile)
+    {
+        $this->newProfile = $profile;
         return $this;
     }
 }

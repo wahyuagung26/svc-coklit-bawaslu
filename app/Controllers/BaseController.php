@@ -83,7 +83,7 @@ abstract class BaseController extends Controller
     public function setPayload(array $data)
     {
         $this->payload = $data;
-        return $this->payload;
+        return $this;
     }
 
     protected function runPayloadValidation(array $validationRule, array $payload)
@@ -94,7 +94,7 @@ abstract class BaseController extends Controller
             return $this->failedValidationResponse($this->validation->getErrors());
         }
 
-        return true;
+        return $this;
     }
 
     protected function user($key = null)

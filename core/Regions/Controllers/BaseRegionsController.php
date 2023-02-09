@@ -7,7 +7,7 @@ use Core\Regions\Models\VillagesModel;
 
 class BaseRegionsController extends BaseController
 {
-    protected function getVillage($villageId)
+    protected function getVillageById($villageId)
     {
         $model = new VillagesModel();
         $village = $model->getById($villageId);

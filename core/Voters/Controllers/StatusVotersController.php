@@ -6,7 +6,7 @@ use Core\Voters\Models\StatusVotersModel;
 
 class StatusVotersController extends BaseVotersController
 {
-    private $statusVoterRule = [
+    private $rule = [
         'id' => [
             'label' => 'ID Pemilih',
             'rules' => 'required'
@@ -15,12 +15,16 @@ class StatusVotersController extends BaseVotersController
 
     public function edit($statusDataId)
     {
-        $this->runPayloadValidation($this->statusVoterRule, $this->payload);
+        try {
+            $this->runPayloadValidation($this->rule, $this->payload);
 
-        $statusData = $this->getStatusData($statusDataId);
-        $voter = $this->update(StatusVotersModel::class, $statusData->active_table_source, $this->payload)
-                        ->getById($this->payload['id']);
+            $statusData = $this->getStatusData($statusDataId);
+            $tableName = $statusData->active_table_source;
 
-        return $this->successResponse($voter);
+            $voter = $this->update(StatusVotersModel::class, $tableName, $this->payload)->getById($this->payload['id']);
+            return $this->successResponse($voter);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
     }
 }

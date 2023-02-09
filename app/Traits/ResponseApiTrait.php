@@ -4,16 +4,25 @@ namespace App\Traits;
 
 trait ResponseApiTrait
 {
-    public function successResponse($data, string $message = '', int $statusCode = HTTP_STATUS_SUCCESS)
-    {
+    public function successResponse(
+        $data,
+        string $message = '',
+        int $statusCode = HTTP_STATUS_SUCCESS
+    ) {
+        $statusCode = $statusCode == 0 ? HTTP_STATUS_SERVER_ERROR : $statusCode;
         return $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
             'data' => &$data
         ]);
     }
 
-    public function paginationResponse($data, array $metadata, $message = '', int $statusCode = HTTP_STATUS_SUCCESS)
-    {
+    public function paginationResponse(
+        $data,
+        array $metadata,
+        string $message = '',
+        int $statusCode = HTTP_STATUS_SUCCESS
+    ) {
+        $statusCode = $statusCode == 0 ? HTTP_STATUS_SERVER_ERROR : $statusCode;
         return $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
             'data' => &$data,
@@ -25,8 +34,12 @@ trait ResponseApiTrait
         ]);
     }
 
-    public function failedValidationResponse(array $error, string $message = '', int $statusCode = HTTP_STATUS_FAILED_VALIDATION)
-    {
+    public function failedValidationResponse(
+        array $error,
+        string $message = '',
+        int $statusCode = HTTP_STATUS_FAILED_VALIDATION
+    ) {
+        $statusCode = $statusCode == 0 ? HTTP_STATUS_SERVER_ERROR : $statusCode;
         $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
             'errors' => &$error
@@ -35,8 +48,11 @@ trait ResponseApiTrait
         exit;
     }
 
-    public function errorResponse($message = '', int $statusCode = HTTP_STATUS_SERVER_ERROR)
-    {
+    public function errorResponse(
+        string $message = '',
+        int $statusCode = HTTP_STATUS_SERVER_ERROR
+    ) {
+        $statusCode = $statusCode == 0 ? HTTP_STATUS_SERVER_ERROR : $statusCode;
         $this->response->setStatusCode($statusCode)->setJson([
             'message' => $message,
             'errors' => $message

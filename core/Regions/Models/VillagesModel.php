@@ -2,6 +2,7 @@
 
 namespace Core\Regions\Models;
 
+use App\Exceptions\ValidationException;
 use Exception;
 use App\Models\CoreModel;
 use App\Traits\ConvertEntityTrait;
@@ -29,14 +30,14 @@ class VillagesModel extends CoreModel
                         ->where('is_deleted', 0)
                         ->orderBy('village_name', 'ASC')
                         ->find();
-                        
+
         return $this->convertEntity(VillagesEntity::class, $villages);
     }
 
     public function setActiveStatusData($statusDataId)
     {
         if (empty($this->id)) {
-            throw new Exception("Id is required", 500);
+            throw new ValidationException("Id is required", 500);
         }
 
         $this->update($this->id, ['last_m_data_status_id' => $statusDataId]);

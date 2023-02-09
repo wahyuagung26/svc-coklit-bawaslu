@@ -2,16 +2,17 @@
 
 namespace Core\Voters\Controllers;
 
+use Core\Voters\Models\GenerateModel;
+use App\Exceptions\ValidationException;
 use Core\Regions\Entities\VillagesEntity;
 use Core\StatusData\Entities\StatusDataEntity;
-use Core\Voters\Models\GenerateModel;
 
 class GenerateController extends BaseVotersController
 {
     public function generate($statusDataId, $villageId)
     {
         $statusData = $this->getStatusData($statusDataId);
-        $village = $this->getVillage($villageId);
+        $village = $this->getVillageById($villageId);
 
         try {
             if ($statusData->id == STATUS_DATA_ORIGINAL) {
@@ -20,24 +21,32 @@ class GenerateController extends BaseVotersController
                 $this->generateSecondaryData($statusData, $village);
             }
 
-            return $this->successResponse(null, "data {$statusData->name} desa {$village->village_name} berhasil dibuat");
+            $message = "data {$statusData->name} desa {$village->village_name} berhasil dibuat";
+            return $this->successResponse(null, $message);
+        } catch (ValidationException $th) {
+            return $this->failedValidationResponse([], $th->getMessage(), $th->getCode());
         } catch (\Throwable $th) {
-            return $this->errorResponse($th->getMessage(), $th->getCode() > 0 ? $th->getCode() : HTTP_STATUS_SERVER_ERROR);
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
     }
 
     private function generateOriginalData(StatusDataEntity $statusData, VillagesEntity $village)
     {
+        $activeTableName = $statusData->active_table_source;
+        $sourceTableName = $statusData->prev_table_source;
+
         $model = new GenerateModel();
-        $model->setActiveTable($statusData->active_table_source)
-                ->setSourceTable($statusData->prev_table_source)
+        $model->setActiveTable($activeTableName)
+                ->setSourceTable($sourceTableName)
                 ->setVillageId($village->id)
                 ->run();
     }
 
     private function generateSecondaryData(StatusDataEntity $statusData, VillagesEntity $village)
     {
-        $generatedColumn = [
+        $activeTableName = $statusData->active_table_source;
+        $sourceTableName = $statusData->prev_table_source;
+        $column = [
             'voters_original_id',
             'm_districts_id',
             'm_villages_id',
@@ -65,9 +74,9 @@ class GenerateController extends BaseVotersController
         ];
 
         $model = new GenerateModel();
-        $model->setActiveTable($statusData->active_table_source)
-                ->setSourceTable($statusData->prev_table_source)
-                ->setGeneratedColumn($generatedColumn)
+        $model->setActiveTable($activeTableName)
+                ->setSourceTable($sourceTableName)
+                ->setGeneratedColumn($column)
                 ->setVillageId($village->id)
                 ->run();
     }

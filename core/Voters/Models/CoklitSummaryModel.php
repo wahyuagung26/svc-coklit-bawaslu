@@ -4,14 +4,17 @@ namespace Core\Voters\Models;
 
 class CoklitSummaryModel extends BaseVotersModel
 {
+    public const STATUS_COKLIT = 1;
+    public const STATUS_UNCOKLIT = 0;
+
     public function getTotalCoklit()
     {
-        return $this->getTotal(1);
+        return $this->getTotal(self::STATUS_COKLIT);
     }
 
     public function getTotalUnCoklit()
     {
-        return $this->getTotal(0);
+        return $this->getTotal(self::STATUS_UNCOKLIT);
     }
 
     private function getTotal($statusCoklit)
@@ -23,7 +26,6 @@ class CoklitSummaryModel extends BaseVotersModel
         }
 
         $total = $this->get()->getRowArray();
-
         return (int) $total['id'] ?? 0;
     }
 }
