@@ -9,6 +9,7 @@ class UsersResponseEntity extends UsersEntity
         'name' => null,
         'username' => null,
         'phone_number' => null,
+        'last_m_data_status_id' => null,
         'm_districts_id' => null,
         'district_name' => null,
         'm_villages_id' => null,

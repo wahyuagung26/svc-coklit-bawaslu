@@ -73,10 +73,9 @@ class CreateVotersController extends BaseVotersController
             $tableName = $statusData->active_table_source;
 
             $model = new CreateVotersModel();
-            $voter = $model->setActiveTable($tableName)
-                        ->insert($this->payload)
-                        ->getLastInsert();
+            $model->setActiveTable($tableName)->insert($this->payload);
 
+            $voter = $model->getById($model->getInsertID());
             return $this->successResponse($voter);
         } catch (\Throwable $th) {
             return $this->errorResponse($th->getMessage(), $th->getCode());

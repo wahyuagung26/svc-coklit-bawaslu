@@ -12,6 +12,11 @@ class CoreModel extends Model
     protected $beforeInsert = ['setDefaultInsertData'];
     protected $beforeUpdate = ['setDefaultUpdateData'];
 
+    protected function user($key = null)
+    {
+        return JwtAuth::user($key);
+    }
+
     protected function setDefaultInsertData(array $data)
     {
         $data['data']['created_at'] = date('Y-m-d H:i:s');

@@ -21,11 +21,11 @@ class GetVotersModel extends BaseVotersModel
         }
 
         if (isset($payload["villages_id"])) {
-            $this->where("m_villages.id", $payload["villages_id"]);
+            $this->where("{$this->table}.m_villages_id", $payload["villages_id"]);
         }
 
         if (isset($payload["districts_id"])) {
-            $this->where("m_districts.id", $payload["districts_id"]);
+            $this->where("{$this->table}.m_districts_id", $payload["districts_id"]);
         }
 
         if (isset($payload["nik"])) {

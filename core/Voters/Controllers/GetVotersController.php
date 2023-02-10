@@ -15,7 +15,7 @@ class GetVotersController extends BaseVotersController
             $payload['page'] = $payload['page'] ?? 1;
 
             $statusData = $this->getStatusData($statusDataId);
-            $voters = $this->getDataByStatus($payload, $statusData);
+            $voters = $this->getByStatusData($payload, $statusData);
 
             return $this->paginationResponse($voters['data'] ?? [], $voters['meta'] ?? []);
         } catch (\Throwable $th) {
@@ -44,10 +44,18 @@ class GetVotersController extends BaseVotersController
         }
     }
 
-    private function getDataByStatus(array $payload, StatusDataEntity $statusData)
+    private function getByStatusData(array $payload, StatusDataEntity $statusData)
     {
         $model = new GetVotersModel();
         $tableName = $statusData->active_table_source;
+
+        if ($this->user('role') == 'admin desa') {
+            $payload['villages_id'] = $this->user('village_id');
+        }
+
+        if ($this->user('role') == 'admin kecamatan') {
+            $payload['districts_id'] = $this->user('district_id');
+        }
 
         return $model->setActiveTable($tableName)
                         ->getAll()

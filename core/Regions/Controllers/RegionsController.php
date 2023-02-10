@@ -2,10 +2,11 @@
 
 namespace Core\Regions\Controllers;
 
+use App\Controllers\BaseController;
 use Core\Regions\Models\DistrictsModel;
 use Core\Regions\Models\VillagesModel;
 
-class RegionsController extends BaseRegionsController
+class RegionsController extends BaseController
 {
     public function getDistricts()
     {

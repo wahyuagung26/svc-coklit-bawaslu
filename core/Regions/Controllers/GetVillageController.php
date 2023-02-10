@@ -2,12 +2,11 @@
 
 namespace Core\Regions\Controllers;
 
-use App\Controllers\BaseController;
 use Core\Regions\Models\VillagesModel;
 
-class BaseRegionsController extends BaseController
+class GetVillageController extends RegionsController
 {
-    protected function getVillageById($villageId)
+    public function getVillageById($villageId)
     {
         $model = new VillagesModel();
         $village = $model->getById($villageId);
@@ -16,6 +15,6 @@ class BaseRegionsController extends BaseController
             return $this->errorResponse('desa / kelurahan tidak ditemukan', HTTP_STATUS_NOT_FOUND);
         }
 
-        return $village;
+        return $this->successResponse($village);
     }
 }

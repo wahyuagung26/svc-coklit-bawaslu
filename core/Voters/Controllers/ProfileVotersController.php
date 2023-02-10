@@ -7,7 +7,7 @@ use Core\Voters\Models\ProfileVotersModel;
 
 class ProfileVotersController extends BaseVotersController
 {
-    private $payload;
+    protected $payload;
     private $oldProfile;
     private $statusData;
     private $profileVoterRule = [

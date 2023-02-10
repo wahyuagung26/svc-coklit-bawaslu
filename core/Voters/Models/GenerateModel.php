@@ -3,10 +3,11 @@
 namespace Core\Voters\Models;
 
 use App\Exceptions\ValidationException;
-use Exception;
 
 class GenerateModel extends BaseVotersModel
 {
+    private $customWhere;
+
     protected $generatedColumn = [
         'voters_original_id' => 'id as voters_original_id',
         'm_districts_id' => 'm_districts_id',
@@ -38,6 +39,12 @@ class GenerateModel extends BaseVotersModel
                     ->startGenerate();
     }
 
+    public function nonTMSOnly()
+    {
+        $this->customWhere = " AND ({$this->sourceTable}.tms = 0 or {$this->sourceTable}.tms IS NULL)";
+        return $this;
+    }
+
     private function runValidationMandatory()
     {
         if (empty($this->table)) {
@@ -60,7 +67,7 @@ class GenerateModel extends BaseVotersModel
         $castColumn = $this->castGeneratedColumn($this->generatedColumn);
 
         $queryInsert = "INSERT INTO {$this->table} ({$castColumn['inserted']})";
-        $querySourceData = "SELECT {$castColumn['selected']} from {$this->sourceTable};";
+        $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.is_deleted != 1 {$this->customWhere}";
 
         $this->db->transStart();
         $this->db->query($queryInsert . ' '. $querySourceData);
@@ -68,7 +75,10 @@ class GenerateModel extends BaseVotersModel
 
         if (!$this->db->transStatus()) {
             $this->db->transRollback();
-            throw new Exception("gagal generate data pemilih, ulangi beberapa saat lagi", HTTP_STATUS_SERVER_ERROR);
+            throw new ValidationException(
+                "gagal generate data pemilih, ulangi beberapa saat lagi",
+                HTTP_STATUS_SERVER_ERROR
+            );
         }
 
         return $this->db->transCommit();
@@ -83,7 +93,7 @@ class GenerateModel extends BaseVotersModel
                     ->getRowArray();
 
         if ($total['id'] > 0) {
-            throw new Exception("data telah tersedia", HTTP_STATUS_CONFLICT);
+            throw new ValidationException("data telah tersedia", HTTP_STATUS_CONFLICT);
         }
 
         return $this;

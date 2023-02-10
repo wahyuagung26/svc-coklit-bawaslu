@@ -24,6 +24,7 @@ class GetUserModel extends BaseUserModel
             'm_districts.district_name',
             'm_user.m_villages_id',
             'm_villages.village_name',
+            'm_villages.last_m_data_status_id',
             'm_user.role',
             'm_user.last_login',
             'm_user.id token'

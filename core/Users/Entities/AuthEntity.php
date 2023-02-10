@@ -12,6 +12,7 @@ class AuthEntity extends UsersEntity
         'username' => null,
         'phone_number' => null,
         'username' => null,
+        'last_m_data_status_id' => null,
         'm_districts_id' => null,
         'm_villages_id' => null,
         'district_name' => null,

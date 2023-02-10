@@ -63,7 +63,8 @@ class BaseVotersModel extends CoreModel
             "{$this->table}.tps",
         ])->table($this->table)
         ->join("m_districts", "m_districts_id = m_districts.id", "left")
-        ->join("m_villages", "m_villages_id = m_villages.id", "left");
+        ->join("m_villages", "m_villages_id = m_villages.id", "left")
+        ->orderBy("{$this->table}.name ASC");
     }
 
     private function queryProcessedVoter()
@@ -99,7 +100,8 @@ class BaseVotersModel extends CoreModel
         ])->table($this->table)
         ->join("m_districts", "m_districts_id = m_districts.id", "left")
         ->join("m_villages", "m_villages_id = m_villages.id", "left")
-        ->where("{$this->table}.is_deleted", 0);
+        ->where("{$this->table}.is_deleted", 0)
+        ->orderBy("{$this->table}.name ASC");
     }
 
     public function getById($id)
