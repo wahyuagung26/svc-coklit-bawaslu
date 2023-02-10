@@ -86,4 +86,22 @@ class GetUserModel extends BaseUserModel
             ]
         ];
     }
+
+    public function setHierarcy()
+    {
+        if ($this->user('role') == 'admin kecamatan') {
+            $this->where('role', 'admin desa');
+            $this->where('m_user.m_districts_id', $this->user('district_id'));
+        }
+
+        if ($this->user('role') == 'admin kabupaten') {
+            $this->whereIn('role', ['admin kecamatan', 'admin desa']);
+        }
+
+        if ($this->user('role') == 'super admin') {
+            $this->whereIn('role', ['admin kecamatan', 'admin desa', 'admin kabupaten']);
+        }
+
+        return $this;
+    }
 }

@@ -22,6 +22,7 @@ class GetUserController extends BaseController
 
             $users = $this->user->getUsers()
                                 ->setFilter($payload)
+                                ->setHierarcy()
                                 ->pagination($payload['page']);
 
             return $this->paginationResponse($users['data'], $users['meta']);
