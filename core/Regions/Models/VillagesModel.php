@@ -3,7 +3,6 @@
 namespace Core\Regions\Models;
 
 use App\Exceptions\ValidationException;
-use Exception;
 use App\Models\CoreModel;
 use App\Traits\ConvertEntityTrait;
 use Core\Regions\Entities\VillagesEntity;
@@ -48,5 +47,17 @@ class VillagesModel extends CoreModel
     {
         $this->id = $id;
         return $this;
+    }
+
+    public function getAll()
+    {
+        return $this->select([
+                    'm_villages.id village_id',
+                    'm_villages.village_name',
+                    'm_districts.id district_id',
+                    'm_districts.district_name'
+                ])->table('m_villages')
+                    ->join('m_districts', 'm_villages.m_districts_id = m_districts.id')
+                    ->find();
     }
 }

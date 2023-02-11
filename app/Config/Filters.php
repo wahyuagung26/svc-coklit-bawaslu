@@ -34,7 +34,7 @@ class Filters extends BaseConfig
     public array $globals = [
         'before' => [
             'cors' => ['except' => ['tools/import']],
-            'auth' => ['except' => ['api/v1/login', 'debug', 'tools/import']],
+            'auth' => ['except' => ['api/v1/login', 'debug', 'tools/import', 'api/v1/voters/*/export/excel', 'api/v1/summaries/*/export/excel']],
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',

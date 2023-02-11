@@ -48,6 +48,7 @@ $routes->group('api', static function ($routes) {
         $routes->get('users/(:any)', '\Core\Users\Controllers\GetUserController::getById/$1');
         $routes->delete('users/(:any)', '\Core\Users\Controllers\ManageUserController::delete/$1');
 
+        $routes->get('voters/(:any)/export/excel', '\Core\Voters\Controllers\ExportController::excel/$1');
         $routes->post('voters/(:any)/submit/(:any)', '\Core\Voters\Controllers\SubmitVotersController::execute/$1/$2');
         $routes->post('voters/(:any)/generate/(:any)', '\Core\Voters\Controllers\GenerateController::generate/$1/$2');
         $routes->get('voters/(:any)/status/(:any)/coklit', '\Core\Voters\Controllers\GetVotersController::coklitSummary/$1/$2');
@@ -57,6 +58,7 @@ $routes->group('api', static function ($routes) {
         $routes->post('voters/(:any)', '\Core\Voters\Controllers\CreateVotersController::create/$1');
         $routes->get('voters/(:any)', '\Core\Voters\Controllers\GetVotersController::index/$1');
 
+        $routes->get('summaries/(:any)/export/excel', '\Core\Recaps\Controllers\ExportController::excel/$1');
         $routes->get('summaries/(:any)', '\Core\Recaps\Controllers\GetRecapController::index/$1');
 
         $routes->get('districts', '\Core\Regions\Controllers\RegionsController::getDistricts');

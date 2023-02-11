@@ -8,6 +8,8 @@ class GenerateModel extends BaseVotersModel
 {
     private $customWhere;
 
+    protected $table = 'voters_pra_dps';
+
     protected $generatedColumn = [
         'voters_original_id' => 'id as voters_original_id',
         'm_districts_id' => 'm_districts_id',
@@ -45,6 +47,11 @@ class GenerateModel extends BaseVotersModel
         return $this;
     }
 
+    public function setDistrict($districtId) {
+        $this->customWhere = " {$this->sourceTable}.m_districts_id = {$districtId} ";
+        return $this;
+    }
+
     private function runValidationMandatory()
     {
         if (empty($this->table)) {
@@ -68,7 +75,7 @@ class GenerateModel extends BaseVotersModel
 
         $queryInsert = "INSERT INTO {$this->table} ({$castColumn['inserted']})";
         if ($this->sourceTable == 'voters_original') {
-            $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.m_villages_id = {$this->villageId} {$this->customWhere}";
+            $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->customWhere}";
         } else {
             $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.m_villages_id = {$this->villageId} AND {$this->sourceTable}.is_deleted != 1 {$this->customWhere}";
         }

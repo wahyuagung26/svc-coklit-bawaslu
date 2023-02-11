@@ -55,8 +55,16 @@ class GetVotersController extends BaseVotersController
                             ->setVillageId($village->id)
                             ->getTotalUnchecked();
 
+            if ($statusData->id == 1) {
+                $model = new CoklitSummaryModel();
+                $uncoklit = $model->setActiveTable($statusData->active_table_source)
+                            ->setVillageId($village->id ?? 0)
+                            ->getTotalUnCoklit();
+            }
+
             return $this->successResponse([
                 'total_unchecked' => $total,
+                'total_uncoklit' => $uncoklit ?? 0,
             ]);
         } catch (\Throwable $th) {
             return $this->errorResponse($th->getMessage(), $th->getCode());
@@ -69,11 +77,11 @@ class GetVotersController extends BaseVotersController
         $tableName = $statusData->active_table_source;
 
         if ($this->user('role') == 'admin desa') {
-            $payload['villages_id'] = $this->user('village_id');
+            $payload['village_id'] = $this->user('village_id');
         }
 
         if ($this->user('role') == 'admin kecamatan') {
-            $payload['districts_id'] = $this->user('district_id');
+            $payload['district_id'] = $this->user('district_id');
         }
 
         return $model->setActiveTable($tableName)

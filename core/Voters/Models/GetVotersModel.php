@@ -16,65 +16,63 @@ class GetVotersModel extends BaseVotersModel
 
     public function setFilter($payload)
     {
-        if (isset($payload["districts_id"])) {
-            $this->where("{$this->table}.m_districts_id", $payload["districts_id"]);
-        } else {
-            $this->where("{$this->table}.m_districts_id", 1);
+        if (isset($payload["district_id"]) && !empty($payload["district_id"])) {
+            $this->where("{$this->table}.m_districts_id", $payload["district_id"]);
         }
 
         if (!empty($this->villageId)) {
             $this->where("m_villages.m_villages_id", $this->villageId);
         }
 
-        if (isset($payload["villages_id"])) {
-            $this->where("{$this->table}.m_villages_id", $payload["villages_id"]);
+        if (isset($payload["village_id"]) && !empty($payload["village_id"])) {
+            $this->where("{$this->table}.m_villages_id", $payload["village_id"]);
         }
 
-        if (isset($payload["nik"])) {
+        if (isset($payload["nik"]) && !empty($payload["nik"])) {
             $this->where("{$this->table}.nik", $payload["nik"]);
         }
 
-        if (isset($payload["rt"])) {
+        if (isset($payload["rt"]) && !empty($payload["rt"])) {
             $this->where("{$this->table}.rt", $payload["rt"]);
         }
 
-        if (isset($payload["rw"])) {
+        if (isset($payload["rw"]) && !empty($payload["rw"])) {
             $this->where("{$this->table}.rw", $payload["rw"]);
         }
 
-        if (isset($payload["tps"])) {
+        if (isset($payload["tps"]) && !empty($payload["tps"])) {
             $this->where("{$this->table}.tps", $payload["tps"]);
         }
 
-        if (isset($payload["married_status"])) {
+        if (isset($payload["married_status"]) && !empty($payload["married_status"])) {
             $this->where("{$this->table}.married_status", $payload["married_status"]);
         }
 
-        if (isset($payload["is_coklit"])) {
+        if (isset($payload["is_coklit"]) && !empty($payload["is_coklit"])) {
             $this->where("{$this->table}.is_coklit", $payload["is_coklit"]);
         }
 
-        if (isset($payload["is_new_voter"])) {
+        if (isset($payload["is_new_voter"]) && !empty($payload["is_new_voter"])) {
             $this->where("{$this->table}.is_new_voter", $payload["is_new_voter"]);
         }
 
-        if (isset($payload["is_novice_voter"])) {
+        if (isset($payload["is_novice_voter"]) && !empty($payload["is_novice_voter"])) {
             $this->where("{$this->table}.is_novice_voter", $payload["is_novice_voter"]);
         }
 
-        if (isset($payload["tms"])) {
+        if (isset($payload["tms"]) && !empty($payload["tms"])) {
             $this->where("{$this->table}.tms", $payload["tms"]);
         }
 
-        if (isset($payload["disabilities"])) {
+        if (isset($payload["disabilities"]) && !empty($payload["disabilities"])) {
             $this->where("{$this->table}.disabilities", $payload["disabilities"]);
         }
 
-        if (isset($payload["is_profile_updated"])) {
+        if (isset($payload["is_profile_updated"]) && !empty($payload["is_profile_updated"])) {
             $this->where("{$this->table}.is_profile_updated", $payload["is_profile_updated"]);
         }
 
-        if (isset($payload["is_checked"])) {
+        if (isset($payload["is_checked"]) && !empty($payload["is_checked"])) {
             $this->where("{$this->table}.is_checked", $payload["is_checked"]);
         }
 
@@ -87,7 +85,7 @@ class GetVotersModel extends BaseVotersModel
         $offset = DEFAULT_PER_PAGE * ($page - 1);
 
         $total = $this->countAllResults(false);
-        $voters = $this->limit($limit, $offset)->find();
+        $voters = $this->orderBy("{$this->table}.name ASC")->limit($limit, $offset)->find();
         $voters = $this->convertEntity(VotersEntity::class, $voters);
         return [
             "data"  => $voters ?? [],
@@ -97,6 +95,11 @@ class GetVotersModel extends BaseVotersModel
                 "per_page" => DEFAULT_PER_PAGE
             ]
         ];
+    }
+
+    public function result()
+    {
+        return $this->orderBy("village_name ASC, district_name ASC, rt ASC, rw ASC, {$this->table}.name ASC")->find();
     }
 
     public function getTotalUnchecked()
