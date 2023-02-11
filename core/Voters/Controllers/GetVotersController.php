@@ -44,6 +44,25 @@ class GetVotersController extends BaseVotersController
         }
     }
 
+    public function getTotalUnChecked($statusDataId, $villageId)
+    {
+        try {
+            $village = $this->getVillageById($villageId);
+            $statusData = $this->getStatusData($statusDataId);
+
+            $model = new GetVotersModel();
+            $total = $model->setSourceTable($statusData->active_table_source)
+                            ->setVillageId($village->id)
+                            ->getTotalUnchecked();
+
+            return $this->successResponse([
+                'total_unchecked' => $total,
+            ]);
+        } catch (\Throwable $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
+        }
+    }
+
     private function getByStatusData(array $payload, StatusDataEntity $statusData)
     {
         $model = new GetVotersModel();

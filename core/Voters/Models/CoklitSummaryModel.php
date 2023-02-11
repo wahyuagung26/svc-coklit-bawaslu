@@ -19,11 +19,14 @@ class CoklitSummaryModel extends BaseVotersModel
 
     private function getTotal($statusCoklit)
     {
-        $this->selectCount('id')->where('is_coklit', $statusCoklit);
+        $this->selectCount('id');
 
         if ($this->villageId > 0) {
             $this->where('m_villages_id', $this->villageId);
         }
+
+        $this->where('is_coklit', $statusCoklit)
+            ->where('is_deleted', 0);
 
         $total = $this->get()->getRowArray();
         return (int) $total['id'] ?? 0;

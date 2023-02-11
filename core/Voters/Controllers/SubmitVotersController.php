@@ -107,7 +107,6 @@ class SubmitVotersController extends BaseVotersController
             'is_novice_voter',
             'is_profile_updated',
             'is_new_data',
-            'is_checked',
             'is_deleted'
         ];
 

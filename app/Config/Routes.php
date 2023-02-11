@@ -50,7 +50,8 @@ $routes->group('api', static function ($routes) {
 
         $routes->post('voters/(:any)/submit/(:any)', '\Core\Voters\Controllers\SubmitVotersController::execute/$1/$2');
         $routes->post('voters/(:any)/generate/(:any)', '\Core\Voters\Controllers\GenerateController::generate/$1/$2');
-        $routes->get('voters/(:any)/coklit/(:any)', '\Core\Voters\Controllers\GetVotersController::coklitSummary/$1/$2');
+        $routes->get('voters/(:any)/status/(:any)/coklit', '\Core\Voters\Controllers\GetVotersController::coklitSummary/$1/$2');
+        $routes->get('voters/(:any)/status/(:any)/unchecked', '\Core\Voters\Controllers\GetVotersController::getTotalUnChecked/$1/$2');
         $routes->put('voters/(:any)/profile', '\Core\Voters\Controllers\ProfileVotersController::edit/$1');
         $routes->put('voters/(:any)/status', '\Core\Voters\Controllers\StatusVotersController::edit/$1');
         $routes->post('voters/(:any)', '\Core\Voters\Controllers\CreateVotersController::create/$1');

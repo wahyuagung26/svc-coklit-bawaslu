@@ -60,7 +60,7 @@ class BaseRecapModel extends BaseVotersModel
                     'tps'
                 ])
                 ->where('m_villages_id', $this->villageId)
-                ->where('is_ktp_el', 1)
+                ->where('is_ktp_el', 0)
                 ->groupBy(['tps', 'gender'])
                 ->get()
                 ->getResult('array');

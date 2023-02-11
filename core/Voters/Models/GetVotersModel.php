@@ -16,16 +16,18 @@ class GetVotersModel extends BaseVotersModel
 
     public function setFilter($payload)
     {
+        if (isset($payload["districts_id"])) {
+            $this->where("{$this->table}.m_districts_id", $payload["districts_id"]);
+        } else {
+            $this->where("{$this->table}.m_districts_id", 1);
+        }
+
         if (!empty($this->villageId)) {
             $this->where("m_villages.m_villages_id", $this->villageId);
         }
 
         if (isset($payload["villages_id"])) {
             $this->where("{$this->table}.m_villages_id", $payload["villages_id"]);
-        }
-
-        if (isset($payload["districts_id"])) {
-            $this->where("{$this->table}.m_districts_id", $payload["districts_id"]);
         }
 
         if (isset($payload["nik"])) {
@@ -95,5 +97,17 @@ class GetVotersModel extends BaseVotersModel
                 "per_page" => DEFAULT_PER_PAGE
             ]
         ];
+    }
+
+    public function getTotalUnchecked()
+    {
+        $this->selectCount('id')
+            ->table($this->table)
+            ->where('m_villages_id', $this->villageId)
+            ->where('is_checked !=', 1)
+            ->where('is_deleted', 0);
+
+        $total = $this->get()->getRowArray();
+        return (int) $total['id'] ?? 0;
     }
 }

@@ -67,7 +67,11 @@ class GenerateModel extends BaseVotersModel
         $castColumn = $this->castGeneratedColumn($this->generatedColumn);
 
         $queryInsert = "INSERT INTO {$this->table} ({$castColumn['inserted']})";
-        $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.is_deleted != 1 {$this->customWhere}";
+        if ($this->sourceTable == 'voters_original') {
+            $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.m_villages_id = {$this->villageId} {$this->customWhere}";
+        } else {
+            $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.m_villages_id = {$this->villageId} AND {$this->sourceTable}.is_deleted != 1 {$this->customWhere}";
+        }
 
         $this->db->transStart();
         $this->db->query($queryInsert . ' '. $querySourceData);
