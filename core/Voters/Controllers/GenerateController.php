@@ -38,6 +38,7 @@ class GenerateController extends BaseVotersController
         $model = new GenerateModel();
         $model->setActiveTable($activeTableName)
                 ->setSourceTable($sourceTableName)
+                ->setDistrict($village->district_id)
                 ->setVillageId($village->id)
                 ->run();
     }
@@ -77,6 +78,7 @@ class GenerateController extends BaseVotersController
         $model->setActiveTable($activeTableName)
                 ->setSourceTable($sourceTableName)
                 ->setGeneratedColumn($column)
+                ->setDistrict($village->district_id)
                 ->setVillageId($village->id)
                 ->run();
     }

@@ -34,6 +34,10 @@ class ProfileVotersModel extends BaseVotersModel
 
         $this->isProfileUpdated = false;
         foreach ($modifiedColumn as $column) {
+            if ($column == 'id') {
+                continue;
+            }
+
             $issetData = isset($oldProfile[$column]) && isset($newProfile[$column]);
             if ($issetData && $oldProfile[$column] != $newProfile[$column]) {
                 $this->isProfileUpdated = true;

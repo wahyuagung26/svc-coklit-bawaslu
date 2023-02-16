@@ -9,6 +9,7 @@ class ProfileVotersController extends BaseVotersController
 {
     protected $payload;
     private $oldProfile;
+    private $profile;
     private $statusData;
     private $profileVoterRule = [
         'id' => [
@@ -33,7 +34,9 @@ class ProfileVotersController extends BaseVotersController
             $this->db->transStart();
             $this->statusData = $this->getStatusData($statusDataId);
 
-            $profile = $this->getProfileFromPrevSource()->updateVoterProfile();
+            $profile = $this->getProfileActive()
+                            ->getProfileFromPrevSource()
+                            ->updateVoterProfile();
 
             $this->db->transCommit();
 
@@ -47,22 +50,32 @@ class ProfileVotersController extends BaseVotersController
         }
     }
 
+    private function getProfileActive()
+    {
+        $voter = new ProfileVotersModel();
+        $voterId = $this->payload['id'];
+        $tableName = $this->statusData->active_table_source;
+
+        $this->profile = $voter->setActiveTable($tableName)->getById($voterId);
+        return $this;
+    }
+
     private function getProfileFromPrevSource()
     {
         /**
          * @todo Menambah kolom baru prev_voters_id pada semua tabel voters sebagai relasi ke data sebelumnya
          */
         $voter = new ProfileVotersModel();
-        $voterId = $this->payload['id'];
         $previousTableName = $this->statusData->prev_table_source;
 
-        $this->oldProfile = $voter->setActiveTable($previousTableName)->getById($voterId);
+        $this->oldProfile = $voter->setActiveTable($previousTableName)->getById($this->profile->voters_original_id);
         return $this;
     }
 
     private function updateVoterProfile()
     {
         $voter = new ProfileVotersModel();
+
         $voterOldProfile = $this->oldProfile->toArray();
         $activeTableName = $this->statusData->active_table_source;
 

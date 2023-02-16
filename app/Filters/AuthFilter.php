@@ -43,7 +43,7 @@ class AuthFilter implements FilterInterface
         if(is_null($token) || empty($token)) {
             $response = service('response');
             $response->setStatusCode(401)->setJSON([
-                'messages' => 'Unauthorized request'
+                'message' => 'Unauthorized request'
             ]);
             return $response;
         }
@@ -54,7 +54,7 @@ class AuthFilter implements FilterInterface
         } catch (Throwable $ex) {
             $response = service('response');
             $response->setStatusCode(401)->setJSON([
-                'messages' => $ex->getMessage()
+                'message' => $ex->getMessage()
             ]);
             return $response;
         }

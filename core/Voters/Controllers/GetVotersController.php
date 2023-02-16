@@ -13,6 +13,7 @@ class GetVotersController extends BaseVotersController
         try {
             $payload = $this->getPayload();
             $payload['page'] = $payload['page'] ?? 1;
+            $payload['per_page'] = $payload['per_page'] ?? 10;
 
             $statusData = $this->getStatusData($statusDataId);
             $voters = $this->getByStatusData($payload, $statusData);
@@ -33,7 +34,9 @@ class GetVotersController extends BaseVotersController
             $statusData = $this->getStatusData($statusDataId);
 
             $model = new CoklitSummaryModel();
-            $model->setActiveTable($statusData->active_table_source)->setVillageId($village->id ?? 0);
+            $model->setActiveTable($statusData->active_table_source)
+                    ->setDistrictId($this->payload['district_id'] ?? 0)
+                    ->setVillageId($village->id ?? 0);
 
             return $this->successResponse([
                 'total_coklit' => $model->getTotalCoklit(),
@@ -52,12 +55,14 @@ class GetVotersController extends BaseVotersController
 
             $model = new GetVotersModel();
             $total = $model->setSourceTable($statusData->active_table_source)
+                            ->setDistrictId($this->payload['district_id'] ?? 0)
                             ->setVillageId($village->id)
                             ->getTotalUnchecked();
 
             if ($statusData->id == 1) {
                 $model = new CoklitSummaryModel();
                 $uncoklit = $model->setActiveTable($statusData->active_table_source)
+                            ->setDistrictId($this->payload['district_id'] ?? 0)
                             ->setVillageId($village->id ?? 0)
                             ->getTotalUnCoklit();
             }
@@ -87,6 +92,6 @@ class GetVotersController extends BaseVotersController
         return $model->setActiveTable($tableName)
                         ->getAll()
                         ->setFilter($payload)
-                        ->pagination($payload['page']);
+                        ->pagination($payload['page'], $payload['per_page'] ?? DEFAULT_PER_PAGE);
     }
 }

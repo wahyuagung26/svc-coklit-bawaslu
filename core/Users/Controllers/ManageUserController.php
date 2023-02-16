@@ -32,7 +32,7 @@ class ManageUserController extends BaseController
         ],
         'phone_number' => [
             'label' => 'Nomor Telepon',
-            'rules' => 'numeric|max_length[18]'
+            'rules' => 'max_length[18]'
         ],
         'role' => [
             'label' => 'Hak Akses',
@@ -63,7 +63,7 @@ class ManageUserController extends BaseController
         ],
         'phone_number' => [
             'label' => 'Nomor Telepon',
-            'rules' => 'numeric|max_length[18]'
+            'rules' => 'max_length[18]'
         ],
     ];
 
@@ -78,8 +78,8 @@ class ManageUserController extends BaseController
             $payload['m_districts_id'] = $this->payload['district_id'] ?? null;
             $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
 
-            $user = $this->user->insert($payload)->getLastInsert();
-            return $this->successResponse($user);
+            $user = $this->user->insert($payload);
+            return $this->successResponse($this->user->getLastInsert());
         } catch (\Throwable $th) {
             return $this->errorResponse($th->getMessage(), $th->getCode());
         }
@@ -98,7 +98,7 @@ class ManageUserController extends BaseController
             $payload['m_villages_id'] = $this->payload['village_id'] ?? null;
 
             $this->user->update($payload['id'], $payload);
-            return $this->successResponse($this->user->getById($payload['id']));
+            return $this->successResponse($this->user->find($payload['id']));
         } catch (\Throwable $th) {
             return $this->errorResponse($th->getMessage(), $th->getCode());
         }

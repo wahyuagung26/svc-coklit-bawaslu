@@ -2,62 +2,154 @@
 
 namespace Core\Voters\Controllers;
 
+use avadim\FastExcelReader\Excel;
 use App\Controllers\BaseController;
-use Core\Regions\Models\VillagesModel;
+use Core\Regions\Models\DistrictsModel;
 use Core\Voters\Models\GenerateModel;
+use Core\Regions\Models\VillagesModel;
 use Core\Voters\Models\VotersOriginalModel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportController extends BaseController
 {
     public function run()
     {
         try {
-            $reader = IOFactory::createReader('Xlsx');
-            $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load(APPPATH."Database/Xls/KASEMBON.xlsx");
+            $arr = [
+                'AMPELGADING.xlsx',
+                'BULULAWANG.xlsx',
+                'DAMPIT.xlsx',
+                'DAMPIT-2.xlsx',
+                'DAMPIT-3.xlsx',
+                'DONOMULYO.xlsx',
+                'GEDANGAN.xlsx',
+                'GONDANGLEGI.xlsx',
+                'GONDANGLEGI-2.xlsx',
+                'JABUNG.xlsx',
+                'KASEMBON.xlsx',
+                'KROMENGAN.xlsx',
+                'LAWANG.xlsx',
+                'LAWANG-2.xlsx',
+                'LAWANG-3.xlsx',
+                'NGAJUM.xlsx',
+                'PAGAK.xlsx',
+                'PAGELARAN.xlsx',
+                'PAKIS.xlsx',
+                'PAKIS-2.xlsx',
+                'PAKIS-3.xlsx',
+                'PAKIS-4.xlsx',
+                'SINGOSARI.xlsx',
+                'SUMBERPUCUNG.xlsx',
+                'TAJINAN.xlsx',
+                'TIRTOYUDO.xlsx',
+                'TUREN.xlsx',
+                'TUREN-2.xlsx',
+                'TUREN-3.xlsx',
+                'WAGIR.xlsx',
+                'WONOSARI.xlsx'
+            ];
 
-            $worksheet = $spreadsheet->getActiveSheet();
-            $highestRow = $worksheet->getHighestRow(); // e.g. 10
+            foreach ($arr as $val) {
+                $file = APPPATH."Database/Xls/".$val;
+                print "Mulai import : $val at " .date("Y-m-d H:i:s"). PHP_EOL;
+                ob_flush();
+                flush();
+                if (file_exists($file)) {
+                    $this->fastExcelReader($file);
+                    print "Berhasil import : $val at " .date("Y-m-d H:i:s"). PHP_EOL;
+                    ob_flush();
+                    flush();
+                }
+            }
+        } catch (\Throwable $th) {
+            $this->db->transRollback();
+            echo $th->getMessage();
+        }
+    }
 
+    private function fastExcelReader($fileName)
+    {
+        try {
+            $newFileName = str_replace('Database/Xls/', 'Database/Xls/done/', $fileName);
             $region = $this->getRegions();
 
-            $arr = [];
-            $districtId = 0;
-            for ($i = 2; $i <= ($highestRow - 1); $i++) {
-                $district = strtolower(str_replace(' ', '', $worksheet->getCell('B'. $i)->getValue()));
-                $village = strtolower(str_replace(' ', '', $worksheet->getCell('C'. $i)->getValue()));
+            $excel = Excel::open($fileName);
+
+            $result = $excel->readRows();
+
+            $this->db->transStart();
+            foreach ($result as $key => $val) {
+                if ($key == 1) {
+                    continue;
+                }
+
+                $district = strtolower(str_replace(' ', '', $val['B']));
+                $village = strtolower(str_replace(' ', '', $val['C']));
                 $districtId = $region[$district]['district_id'] ?? '';
 
+                // if (!isset($region[$district]['district_id'])) {
+                //     $modelDistrict = new DistrictsModel();
+                //     $modelDistrict->insert([
+                //         'district_name' => $val['B'],
+                //         'is_deleted' => 0
+                //     ]);
+
+                //     $id = $modelDistrict->getInsertId();
+                //     $region[$district]['district_id'] = $id;
+                // }
+
+                // if (!isset($region[$district][$village]['village_id'])) {
+                //     $modelVillage = new VillagesModel();
+                //     $modelVillage->insert([
+                //         'id' => date('mdhis'.$key),
+                //         'm_districts_id' => $districtId,
+                //         'village_name' => $val['C'],
+                //         'last_m_data_status_id' => 1,
+                //         'is_deleted' => 0
+                //     ]);
+
+                //     $id = $modelVillage->getInsertId();
+                //     $region[$district][$village]['village_id'] = $id;
+                // }
+
                 $arr[] = [
-                    'code' => $worksheet->getCell('A'. $i)->getValue(),
-                    'm_districts_id' => $region[$district]['district_id'] ?? '',
-                    'm_villages_id' => $region[$district][$village]['village_id'] ?? '',
-                    'dp_id' => $worksheet->getCell('D'. $i)->getValue(),
-                    'nkk' => $worksheet->getCell('E'. $i)->getValue(),
-                    'nik' => $worksheet->getCell('F'. $i)->getValue(),
-                    'name' => $worksheet->getCell('G'. $i)->getValue(),
-                    'place_of_birth' => $worksheet->getCell('H'. $i)->getValue(),
-                    'date_of_birth' => $this->dateOfBirth($worksheet->getCell('I'. $i)->getValue()),
-                    'married_status' => $this->marriedStatus($worksheet->getCell('J'. $i)->getValue()),
-                    'gender' => $this->gender($worksheet->getCell('K'. $i)->getValue()),
-                    'address' => $worksheet->getCell('L'. $i)->getValue(),
-                    'rt' => $worksheet->getCell('M'. $i)->getValue(),
-                    'rw' => $worksheet->getCell('N'. $i)->getValue(),
-                    'disabilities' => $worksheet->getCell('O'. $i)->getValue(),
-                    'filters' => $worksheet->getCell('P'. $i)->getValue(),
+                    'code' => $val['A'],
+                    'm_districts_id' => $region[$district]['district_id'] ?? $val['B'],
+                    'm_villages_id' => $region[$district][$village]['village_id'] ?? $val['C'],
+                    'dp_id' => $val['D'],
+                    'nkk' => $val['E'],
+                    'nik' => $val['F'],
+                    'name' => $val['G'],
+                    'place_of_birth' => $val['H'],
+                    'date_of_birth' => $this->dateOfBirth($val['I']),
+                    'married_status' => $this->marriedStatus($val['J']),
+                    'gender' => $this->gender($val['K']),
+                    'address' => $val['L'],
+                    'rt' => $val['M'],
+                    'rw' => $val['N'],
+                    'disabilities' => $val['O'],
+                    'filters' => $val['P'],
                     'm_data_status_id' => 1,
-                    'tps' => $worksheet->getCell('R'. $i)->getValue(),
-                    'sort_data' => $worksheet->getCell('T'. $i)->getValue(),
+                    'tps' => $val['R'],
+                    'sort_data' => $val['T'],
                 ];
+
+                if (count($arr) > 20000) {
+                    $model = new VotersOriginalModel();
+                    if (!empty($arr)) {
+                        $model->insertBatch($arr);
+                        echo "Insert : ".count($val)." data ".$fileName." at " .date("Y-m-d H:i:s"). PHP_EOL;
+                        ob_flush();
+                        flush();
+                    }
+
+                    $arr = [];
+                }
             }
 
             $model = new VotersOriginalModel();
-            if (empty($arr)) {
-                return false;
+            if (!empty($arr)) {
+                $model->insertBatch($arr);
             }
-            $this->db->transStart();
-            $model->insertBatch($arr);
 
             $generate = new GenerateModel();
             $generate->setActiveTable('voters_pra_dps')
@@ -65,9 +157,16 @@ class ImportController extends BaseController
                     ->setDistrict($districtId)
                     ->setVillageId(1)
                     ->run();
+
+            rename($fileName, $newFileName);
+
             $this->db->transCommit();
         } catch (\Throwable $th) {
+            if (file_exists($newFileName)) {
+                rename($newFileName, $fileName);
+            }
             $this->db->transRollback();
+
             echo $th->getMessage();
         }
     }
@@ -87,7 +186,11 @@ class ImportController extends BaseController
     private function dateOfBirth($date)
     {
         $explode = explode('|', $date);
-        return $explode[2].'-'.$explode[1].'-'.$explode[0];
+        $year = ($explode[2] ?? '1970');
+        $month = ($explode[1] ?? '01');
+        $day = ($explode[0] ?? '01');
+        $date = ($year == '0000' ? '1970' : $year).'-'. ($month == '00' ? '01' : $month).'-'.($day ==  '00' ? '01' : $day);
+        return $date == '0000-00-00' ? '1970-01-01' : $date;
     }
 
     private function getRegions()

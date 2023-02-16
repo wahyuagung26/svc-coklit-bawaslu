@@ -28,6 +28,6 @@ class ManageUserModel extends CoreModel
     public function getLastInsert()
     {
         $id = $this->getInsertId();
-        return $this->getById($id);
+        return $this->find($id);
     }
 }

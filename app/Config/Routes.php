@@ -58,6 +58,9 @@ $routes->group('api', static function ($routes) {
         $routes->post('voters/(:any)', '\Core\Voters\Controllers\CreateVotersController::create/$1');
         $routes->get('voters/(:any)', '\Core\Voters\Controllers\GetVotersController::index/$1');
 
+        $routes->post('mass/coklit/(:any)', '\Core\Voters\Controllers\MassUpdateController::coklit/$1');
+        $routes->post('mass/checklist/(:any)', '\Core\Voters\Controllers\MassUpdateController::checklist/$1');
+
         $routes->get('summaries/(:any)/export/excel', '\Core\Recaps\Controllers\ExportController::excel/$1');
         $routes->get('summaries/(:any)', '\Core\Recaps\Controllers\GetRecapController::index/$1');
 

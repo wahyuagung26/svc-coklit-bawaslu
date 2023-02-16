@@ -13,7 +13,7 @@ class VillagesModel extends CoreModel
 
     protected $table = 'm_villages';
     protected $returnType = 'array';
-    protected $allowedFields = ['last_m_data_status_id'];
+    protected $allowedFields = ['id', 'm_districts_id', 'village_name', 'last_m_data_status_id'];
 
     private $id = '';
 

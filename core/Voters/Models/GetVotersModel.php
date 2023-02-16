@@ -8,6 +8,8 @@ class GetVotersModel extends BaseVotersModel
 {
     protected $table = "voters_pra_dps";
 
+    private $districtId;
+
     public function getAll()
     {
         $this->getVoters();
@@ -79,20 +81,22 @@ class GetVotersModel extends BaseVotersModel
         return $this;
     }
 
-    public function pagination($page = 1)
+    public function pagination($page = 1, $perPage = DEFAULT_PER_PAGE)
     {
-        $limit = DEFAULT_PER_PAGE;
-        $offset = DEFAULT_PER_PAGE * ($page - 1);
+        $limit = $perPage;
+        $offset = $perPage * ($page - 1);
 
         $total = $this->countAllResults(false);
-        $voters = $this->orderBy("{$this->table}.name ASC")->limit($limit, $offset)->find();
+        $voters = $this->where("{$this->table}.is_deleted", 0)
+                        ->limit($limit, $offset)
+                        ->find();
         $voters = $this->convertEntity(VotersEntity::class, $voters);
         return [
             "data"  => $voters ?? [],
             "meta"  => [
                 "total_item" => $total ?? 0,
                 "page"  => $page,
-                "per_page" => DEFAULT_PER_PAGE
+                "per_page" => $perPage
             ]
         ];
     }
@@ -105,12 +109,23 @@ class GetVotersModel extends BaseVotersModel
     public function getTotalUnchecked()
     {
         $this->selectCount('id')
-            ->table($this->table)
-            ->where('m_villages_id', $this->villageId)
-            ->where('is_checked !=', 1)
+            ->table($this->table);
+
+        if ($this->districtId > 0) {
+            $this->where('m_districts_id', $this->districtId);
+        }
+
+        $this->where('m_villages_id', $this->villageId)
+            ->where('is_checked', 0)
             ->where('is_deleted', 0);
 
         $total = $this->get()->getRowArray();
         return (int) $total['id'] ?? 0;
+    }
+
+    public function setDistrictId($districtId)
+    {
+        $this->districtId = $districtId;
+        return $this;
     }
 }

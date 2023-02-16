@@ -7,6 +7,8 @@ class CoklitSummaryModel extends BaseVotersModel
     public const STATUS_COKLIT = 1;
     public const STATUS_UNCOKLIT = 0;
 
+    private $districtId;
+
     public function getTotalCoklit()
     {
         return $this->getTotal(self::STATUS_COKLIT);
@@ -20,6 +22,10 @@ class CoklitSummaryModel extends BaseVotersModel
     private function getTotal($statusCoklit)
     {
         $this->selectCount('id');
+        
+        if ($this->districtId > 0) {
+            $this->where('m_districts_id', $this->districtId);
+        }
 
         if ($this->villageId > 0) {
             $this->where('m_villages_id', $this->villageId);
@@ -30,5 +36,11 @@ class CoklitSummaryModel extends BaseVotersModel
 
         $total = $this->get()->getRowArray();
         return (int) $total['id'] ?? 0;
+    }
+
+    public function setDistrictId($districtId)
+    {
+        $this->districtId = $districtId;
+        return $this;
     }
 }

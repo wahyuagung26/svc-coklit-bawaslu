@@ -36,6 +36,7 @@ class VotersEntity extends Entity
         'is_checked' => null,
         'is_deleted' => null,
         'is_new_data' => null,
+        'voters_original_id' => null,
     ];
 
     protected $casts = [
