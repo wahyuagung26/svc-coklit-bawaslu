@@ -1,9 +1,28 @@
-steps {
-    sshagent(credentials: ['ssh-app-bawaslu']) {
-      sh '''
-          [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-          ssh-keyscan -t rsa,dsa -p 65002 185.187.241.21 >> ~/.ssh/known_hosts
-          ssh u909598054@185.187.241.21 ...
-      '''
-    }
-}
+pipeline {
+     agent any
+     stages {
+          stage('Deploy Production') {
+                when {
+                    branch 'main';
+                }
+                steps {
+                    sshagent(['ssh-app-bawaslu']) {
+                         // some block
+                         sh '''
+                              ssh -o StrictHostKeyChecking=no -p 65002 -l u909598054 185.187.241.21 << ENDSSH
+                              cd public_html/public_html/portofolio/bawaslu-api
+                              wait
+                              git fetch
+                              wait
+                              git checkout main
+                              wait
+                              git pull
+                              wait 
+                              composer install
+                         '''
+                    }
+               }
+          }
+     }
+ }
+ 
