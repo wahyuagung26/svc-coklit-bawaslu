@@ -2,6 +2,7 @@ pipeline {
      agent any
      stages {
           stage('Deploy Production') {
+                when { branch 'main' }
                 steps {
                     sshagent(['ssh-app-bawaslu']) {
                          // some block
