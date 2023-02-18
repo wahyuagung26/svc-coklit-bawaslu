@@ -1,9 +1,9 @@
 steps {
-    sshagent(credentials: ['ssh-credentials-id']) {
+    sshagent(credentials: ['ssh-app-bawaslu']) {
       sh '''
           [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-          ssh-keyscan -t rsa,dsa example.com >> ~/.ssh/known_hosts
-          ssh user@example.com ...
+          ssh-keyscan -t rsa,dsa -p 65002 185.187.241.21 >> ~/.ssh/known_hosts
+          ssh u909598054@185.187.241.21 ...
       '''
     }
 }
