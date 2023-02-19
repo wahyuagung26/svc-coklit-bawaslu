@@ -14,8 +14,6 @@ pipeline {
                               git checkout main
                               wait
                               git pull
-                              wait 
-                              composer install
                          '''
                     }
                }
