@@ -35,8 +35,7 @@ class Cors implements FilterInterface
 
         $allowed_domains = array(
             'http://localhost:4200',
-            'https://exmple.com',
-            'https://www.exmple.com',
+            'https://bawaslu.wahyuagung.id',
         );
 
         if (in_array($origin, $allowed_domains)) {
