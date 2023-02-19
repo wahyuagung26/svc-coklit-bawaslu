@@ -19,7 +19,7 @@ pipeline {
           }
           stage('Deploy Production') {
                 when { 
-                    branch 'master';
+                    branch 'main';
                 }
                 steps {
                     sshagent(['ssh-app-bawaslu']) {
