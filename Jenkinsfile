@@ -7,7 +7,20 @@ pipeline {
         SSH_PROJECT_DIRECTORY     = 'public_html/public_html/portofolio/bawaslu-api'
     }
      stages {
-          stage('Deploy') {
+        stage('Deploy Development') {
+                when { 
+                    branch 'development';
+                }
+                steps {
+                    sshagent(['ssh-app-bawaslu']) {
+                         echo 'push to development'
+                    }
+               }
+          }
+          stage('Deploy Production') {
+                when { 
+                    branch 'master';
+                }
                 steps {
                     sshagent(['ssh-app-bawaslu']) {
                          sh '''
