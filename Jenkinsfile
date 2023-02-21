@@ -1,9 +1,9 @@
 pipeline {
     agent any
     environment {
-        SSH_USERNAME = 'u909598054'
-        SSH_HOST     = '185.187.241.21'
-        SSH_PORT     = '65002'
+        SSH_USERNAME = '15919-2460'
+        SSH_HOST     = 'gate.jagoan.cloud'
+        SSH_PORT     = 'p3022'
         SSH_PROJECT_DIRECTORY     = 'public_html/public_html/portofolio/bawaslu-api'
     }
      stages {
@@ -13,7 +13,7 @@ pipeline {
                 }
                 steps {
                     sshagent(['ssh-app-bawaslu']) {
-                         echo 'push to development'
+                         echo 'deploy to development'
                     }
                }
           }
@@ -26,11 +26,8 @@ pipeline {
                          sh '''
                               ssh -o StrictHostKeyChecking=no -p ${SSH_PORT} -l ${SSH_USERNAME} ${SSH_HOST} << ENDSSH
                               cd ${SSH_PROJECT_DIRECTORY}
-                              wait
                               git fetch
-                              wait
                               git checkout main
-                              wait
                               git pull
                          '''
                     }
