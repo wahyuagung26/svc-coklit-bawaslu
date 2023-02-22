@@ -36,6 +36,7 @@ class Cors implements FilterInterface
         $allowed_domains = array(
             'http://localhost:4200',
             'https://bawaslu.wahyuagung.id',
+            'http://node15919-bwsmalang.jh-beon.cloud',
         );
 
         if (in_array($origin, $allowed_domains)) {
