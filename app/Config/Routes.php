@@ -37,7 +37,7 @@ $routes->get('/debug', 'Home::index');
  * API Routing V1
  * ---------------------------------------------------------------------
  */
-$routes->group('api', static function ($routes) {
+$routes->group('v1', static function ($routes) {
     $routes->post('login', '\Core\Users\Controllers\AuthController::login');
     $routes->get('profile', '\Core\Users\Controllers\AuthController::profile');
 
