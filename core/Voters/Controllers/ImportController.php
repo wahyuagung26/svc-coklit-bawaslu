@@ -11,10 +11,45 @@ use Core\Voters\Models\VotersOriginalModel;
 
 class ImportController extends BaseController
 {
+    public function copy() {
+        $generate = new GenerateModel();
+        $generate->setActiveTable('voters_pra_dps')
+                ->setSourceTable('voters_original')
+                ->runInitialData();
+        
+        print "Berhasil copy voters_original ke voters_pra_dps at " .date("Y-m-d H:i:s"). PHP_EOL;
+        ob_flush();
+    }
+
     public function run()
     {
         try {
             $arr = [
+                'BANTUR-2.xlsx',
+                'BANTUR.xlsx',
+                'BULULAWANG-2.xlsx',
+                'DONOMULYO-2.xlsx',
+                'DONOMULYO-3.xlsx',
+                'GEDANGAN-2.xlsx',
+                'GONDANGLEGI-3.xlsx',
+                'JABUNG-2.xlsx',
+                'KROMENGAN-2.xlsx',
+                'NGAJUM-2.xlsx',
+                'PAGAK-2.xlsx',
+                'PAGELARAN-2.xlsx',
+                'PUJON-2.xlsx',
+                'PUJON.xlsx',
+                'SINGOSARI-2.xlsx',
+                'SINGOSARI-3.xlsx',
+                'SINGOSARI-4.xlsx',
+                'SINGOSARI-5.xlsx',
+                'SUMBERPUCUNG-2.xlsx',
+                'TAJINAN-2.xlsx',
+                'TIRTOYUDO-2.xlsx',
+                'TIRTOYUDO-3.xlsx',
+                'WAGIR-2.xlsx',
+                'WONOSARI-2.xlsx',
+                'AMPELGADING-2.xlsx',
                 'AMPELGADING.xlsx',
                 'BULULAWANG.xlsx',
                 'DAMPIT.xlsx',
@@ -84,32 +119,6 @@ class ImportController extends BaseController
 
                 $district = strtolower(str_replace(' ', '', $val['B']));
                 $village = strtolower(str_replace(' ', '', $val['C']));
-                $districtId = $region[$district]['district_id'] ?? '';
-
-                // if (!isset($region[$district]['district_id'])) {
-                //     $modelDistrict = new DistrictsModel();
-                //     $modelDistrict->insert([
-                //         'district_name' => $val['B'],
-                //         'is_deleted' => 0
-                //     ]);
-
-                //     $id = $modelDistrict->getInsertId();
-                //     $region[$district]['district_id'] = $id;
-                // }
-
-                // if (!isset($region[$district][$village]['village_id'])) {
-                //     $modelVillage = new VillagesModel();
-                //     $modelVillage->insert([
-                //         'id' => date('mdhis'.$key),
-                //         'm_districts_id' => $districtId,
-                //         'village_name' => $val['C'],
-                //         'last_m_data_status_id' => 1,
-                //         'is_deleted' => 0
-                //     ]);
-
-                //     $id = $modelVillage->getInsertId();
-                //     $region[$district][$village]['village_id'] = $id;
-                // }
 
                 $arr[] = [
                     'code' => $val['A'],
@@ -151,12 +160,12 @@ class ImportController extends BaseController
                 $model->insertBatch($arr);
             }
 
-            $generate = new GenerateModel();
-            $generate->setActiveTable('voters_pra_dps')
-                    ->setSourceTable('voters_original')
-                    ->setDistrict($districtId)
-                    ->setVillageId(1)
-                    ->run();
+            // $generate = new GenerateModel();
+            // $generate->setActiveTable('voters_pra_dps')
+            //         ->setSourceTable('voters_original')
+            //         ->setDistrict($districtId)
+            //         ->setVillageId(1)
+            //         ->run();
 
             rename($fileName, $newFileName);
 

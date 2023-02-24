@@ -69,6 +69,7 @@ $routes->group('v1', static function ($routes) {
 });
 
 $routes->cli('tools/import', '\Core\Voters\Controllers\ImportController::run');
+$routes->cli('tools/copy', '\Core\Voters\Controllers\ImportController::copy');
 
 /*
  * --------------------------------------------------------------------

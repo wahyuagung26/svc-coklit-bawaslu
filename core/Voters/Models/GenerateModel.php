@@ -41,6 +41,11 @@ class GenerateModel extends BaseVotersModel
                     ->startGenerate();
     }
 
+    public function runInitialData()
+    {
+        return $this->startGenerateAll();
+    }
+
     public function nonTMSOnly()
     {
         $this->customWhere = " AND ({$this->sourceTable}.tms = 0 or {$this->sourceTable}.tms IS NULL)";
@@ -78,6 +83,32 @@ class GenerateModel extends BaseVotersModel
             $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->customWhere}";
         } else {
             $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.m_villages_id = {$this->villageId} AND {$this->sourceTable}.is_deleted != 1 {$this->customWhere}";
+        }
+
+        $this->db->transStart();
+        $this->db->query($queryInsert . ' '. $querySourceData);
+        $this->db->transComplete();
+
+        if (!$this->db->transStatus()) {
+            $this->db->transRollback();
+            throw new ValidationException(
+                "gagal generate data pemilih, ulangi beberapa saat lagi",
+                HTTP_STATUS_SERVER_ERROR
+            );
+        }
+
+        return $this->db->transCommit();
+    }
+
+    private function startGenerateAll()
+    {
+        $castColumn = $this->castGeneratedColumn($this->generatedColumn);
+
+        $queryInsert = "INSERT INTO {$this->table} ({$castColumn['inserted']})";
+        if ($this->sourceTable == 'voters_original') {
+            $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable}";
+        } else {
+            $querySourceData = "SELECT {$castColumn['selected']} FROM {$this->sourceTable} WHERE {$this->sourceTable}.is_deleted != 1 {$this->customWhere}";
         }
 
         $this->db->transStart();
