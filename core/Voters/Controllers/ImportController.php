@@ -4,10 +4,10 @@ namespace Core\Voters\Controllers;
 
 use avadim\FastExcelReader\Excel;
 use App\Controllers\BaseController;
-use Core\Regions\Models\DistrictsModel;
 use Core\Voters\Models\GenerateModel;
 use Core\Regions\Models\VillagesModel;
 use Core\Voters\Models\VotersOriginalModel;
+use Core\Voters\Models\VotersPraDpsModel;
 
 class ImportController extends BaseController
 {
@@ -158,10 +158,18 @@ class ImportController extends BaseController
                 ];
 
                 if (count($arr) > 20000) {
-                    $model = new VotersOriginalModel();
                     if (!empty($arr)) {
+                        // Insert data original
+                        $model = new VotersOriginalModel();
                         $model->insertBatch($arr);
-                        echo "Insert : ".count($val)." data ".$fileName." at " .date("Y-m-d H:i:s"). PHP_EOL;
+                        echo "Insert data original : ".count($val)." data ".$fileName." at " .date("H:i:s"). PHP_EOL;
+                        ob_flush();
+                        flush();
+
+                        // Insert data pra Dps
+                        $model = new VotersPraDpsModel();
+                        $model->insertBatch($arr);
+                        echo "Insert data original : ".count($val)." data ".$fileName." at " .date("H:i:s"). PHP_EOL;
                         ob_flush();
                         flush();
                     }
@@ -175,12 +183,10 @@ class ImportController extends BaseController
                 $model->insertBatch($arr);
             }
 
-            // $generate = new GenerateModel();
-            // $generate->setActiveTable('voters_pra_dps')
-            //         ->setSourceTable('voters_original')
-            //         ->setDistrict($districtId)
-            //         ->setVillageId(1)
-            //         ->run();
+            $model = new VotersPraDpsModel();
+            if (!empty($arr)) {
+                $model->insertBatch($arr);
+            }
 
             rename($fileName, $newFileName);
 
