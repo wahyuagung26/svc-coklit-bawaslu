@@ -11,6 +11,9 @@ use Core\Voters\Models\VotersPraDpsModel;
 
 class ImportController extends BaseController
 {
+    public const SOURCE_EXCEL = APPPATH."Database/Xls/";
+    public const TEMP_FILE_NAME = "temp.xlsx";
+
     public function copy()
     {
         $generate = new GenerateModel();
@@ -25,16 +28,16 @@ class ImportController extends BaseController
     public function run()
     {
         try {
-            $files = array_diff(scandir(APPPATH."Database/Xls/"), array('.', '..'));
+            $files = array_diff(scandir(self::SOURCE_EXCEL), array('.', '..'));
             foreach ($files as $val) {
                 if (!preg_match("/xlsx/i", $val)) {
                     continue;
                 }
 
-                $file = APPPATH."Database/Xls/".$val;
+                $file = self::SOURCE_EXCEL.$val;
 
                 if (file_exists($file)) {
-                    $this->fastExcelReader($file);
+                    $this->fastImportExcel($file);
                 }
             }
         } catch (\Throwable $th) {
@@ -43,72 +46,75 @@ class ImportController extends BaseController
         }
     }
 
-    private function fastExcelReader($fileName)
+    private function fastImportExcel($fileName)
     {
         try {
             $newFileName = str_replace('Database/Xls/', 'Database/Xls/done/', $fileName);
             $region = $this->getRegions();
 
             $excel = Excel::open($fileName);
+            $original = new VotersOriginalModel();
+            $praDps = new VotersPraDpsModel();
+
+            // Remove all data from district
+            if (isset($this->payload['is_reset']) && isset($this->payload['district_id'])) {
+                $praDps->softDeleteAll($this->payload['district_id']);
+            }
 
             $result = $excel->readRows();
 
             $this->db->transStart();
             foreach ($result as $key => $val) {
-                if ($key == 1) {
+                if ($key == 1 || $val == self::TEMP_FILE_NAME) {
                     continue;
                 }
 
-                $district = strtolower(str_replace(' ', '', $val['B']));
-                $village = strtolower(str_replace(' ', '', $val['C']));
+                $district = strtolower(str_replace(' ', '', $val['B'] ?? '0'));
+                $village = strtolower(str_replace(' ', '', $val['C'] ?? '0'));
 
                 $arr[] = [
-                    'code' => $val['A'],
-                    'm_districts_id' => $region[$district]['district_id'] ?? $val['B'],
-                    'm_villages_id' => $region[$district][$village]['village_id'] ?? $val['C'],
-                    'dp_id' => $val['D'],
-                    'nkk' => $val['E'],
-                    'nik' => $val['F'],
-                    'name' => $val['G'],
-                    'place_of_birth' => $val['H'],
-                    'date_of_birth' => $this->dateOfBirth($val['I']),
-                    'married_status' => $this->marriedStatus($val['J']),
-                    'gender' => $this->gender($val['K']),
-                    'address' => $val['L'],
-                    'rt' => $val['M'],
-                    'rw' => $val['N'],
-                    'disabilities' => $val['O'],
-                    'filters' => $val['P'],
+                    'code' => $val['A'] ?? '',
+                    'm_districts_id' => $region[$district]['district_id'] ?? substr($val['B'], 0, 8) ?? '0',
+                    'm_villages_id' => $region[$district][$village]['village_id'] ?? substr($val['C'], 0, 12) ?? '0',
+                    'dp_id' => $val['D'] ?? '0',
+                    'nkk' => $val['E'] ?? '0',
+                    'nik' => $val['F'] ?? '0',
+                    'name' => $val['G'] ?? '0',
+                    'place_of_birth' => $val['H'] ?? '0',
+                    'date_of_birth' => $this->dateOfBirth($val['I'] ?? '0'),
+                    'married_status' => $this->marriedStatus($val['J'] ?? 0),
+                    'gender' => $this->gender($val['K'] ?? 1),
+                    'address' => $val['L'] ?? '0',
+                    'rt' => $val['M'] ?? '0',
+                    'rw' => $val['N'] ?? '0',
+                    'disabilities' => $val['O'] ?? 0,
+                    'filters' => $val['P'] ?? '0',
                     'm_data_status_id' => 1,
-                    'tps' => isset($val['T']) ? $val['R'] : $val['Q'],
+                    'tps' => isset($val['T']) ? $val['R'] : $val['Q'] ?? 0,
                     'sort_data' => $val['T'] ?? '',
                 ];
 
                 if (count($arr) > 20000) {
                     if (!empty($arr)) {
-                        // Insert data original
-                        $model = new VotersOriginalModel();
-                        $model->insertBatch($arr);
-                        echo "Insert data original : ".count($val)." data ".$fileName." at " .date("H:i:s"). PHP_EOL;
-                        
+                        if (!isset($this->payload['is_pra_dps'])) {
+                            // Insert data original
+                            $original->insertBatch($arr);
+                        }
+
                         // Insert data pra Dps
-                        $model = new VotersPraDpsModel();
-                        $model->insertBatch($arr);
-                        echo "Insert data original : ".count($val)." data ".$fileName." at " .date("H:i:s"). PHP_EOL;
+                        $praDps->insertBatch($arr);
                     }
 
                     $arr = [];
                 }
             }
 
-            $model = new VotersOriginalModel();
-            if (!empty($arr)) {
-                $model->insertBatch($arr);
+            if (!isset($this->payload['is_pra_dps']) && !empty($arr)) {
+                $original->insertBatch($arr);
             }
 
-            $model = new VotersPraDpsModel();
             if (!empty($arr)) {
-                $model->insertBatch($arr);
+                $praDps->insertBatch($arr);
             }
 
             rename($fileName, $newFileName);
@@ -118,6 +124,7 @@ class ImportController extends BaseController
             if (file_exists($newFileName)) {
                 rename($newFileName, $fileName);
             }
+
             $this->db->transRollback();
 
             print($th);
@@ -142,7 +149,7 @@ class ImportController extends BaseController
         $year = ($explode[2] ?? '1970');
         $month = ($explode[1] ?? '01');
         $day = ($explode[0] ?? '01');
-        $date = ($year == '0000' ? '1970' : $year).'-'. ($month == '00' ? '01' : $month).'-'.($day ==  '00' ? '01' : $day);
+        $date = (($year == '0000' || $year == '****') ? '1972' : $year).'-'. ($month == '00' ? '01' : $month).'-'.($day ==  '00' ? '01' : $day);
         return $date == '0000-00-00' ? '1970-01-01' : $date;
     }
 
@@ -161,5 +168,33 @@ class ImportController extends BaseController
         }
 
         return $region;
+    }
+
+    public function upload()
+    {
+        $fileInBase64 = $this->payload['file'];
+
+        $fileInBase64 = str_replace(' ', '+', $fileInBase64);
+        $file = base64_decode($fileInBase64);
+
+        file_put_contents(self::SOURCE_EXCEL.self::TEMP_FILE_NAME, $file);
+
+        return $this->successResponse(null, 'success upload data');
+    }
+
+    public function importDistricts()
+    {
+        try {
+            $file = self::SOURCE_EXCEL.'temp.xlsx';
+
+            if (file_exists($file)) {
+                $this->fastImportExcel($file);
+            }
+
+            return $this->successResponse(null, 'success import data');
+        } catch (\Throwable $th) {
+            $this->db->transRollback();
+            echo $th->getMessage();
+        }
     }
 }

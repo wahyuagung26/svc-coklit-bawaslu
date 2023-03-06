@@ -6,7 +6,6 @@ class VotersPraDpsModel extends BaseVotersModel
 {
     protected $table = 'voters_pra_dps';
     protected $allowedFields = [
-        'code',
         'm_districts_id',
         'm_villages_id',
         'nkk',
@@ -20,7 +19,12 @@ class VotersPraDpsModel extends BaseVotersModel
         'rt',
         'rw',
         'disabilities',
-        'm_data_status_id',
         'tps',
     ];
+
+    public function softDeleteAll($districtId)
+    {
+        $this->db->query('update voters_pra_dps set is_deleted = 0 where m_districts_id = "'.$districtId.'"');
+        return true;
+    }
 }

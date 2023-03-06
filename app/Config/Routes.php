@@ -66,6 +66,9 @@ $routes->group('v1', static function ($routes) {
     $routes->get('districts', '\Core\Regions\Controllers\RegionsController::getDistricts');
     $routes->get('districts/(:any)/villages', '\Core\Regions\Controllers\RegionsController::getVillages/$1');
     $routes->get('villages/(:any)', '\Core\Regions\Controllers\GetVillageController::getVillageById/$1');
+
+    $routes->post('tools/import/upload', '\Core\Voters\Controllers\ImportController::upload');
+    $routes->post('tools/import/run', '\Core\Voters\Controllers\ImportController::importDistricts');
 });
 
 $routes->cli('tools/import', '\Core\Voters\Controllers\ImportController::run');
