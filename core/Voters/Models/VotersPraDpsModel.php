@@ -24,7 +24,7 @@ class VotersPraDpsModel extends BaseVotersModel
 
     public function softDeleteAll($districtId)
     {
-        $this->db->query('update voters_pra_dps set is_deleted = 0 where m_districts_id = "'.$districtId.'"');
+        $this->db->query('update voters_pra_dps set is_deleted = 1 where m_districts_id = "'.$districtId.'"');
         return true;
     }
 }
