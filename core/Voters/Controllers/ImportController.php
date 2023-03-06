@@ -80,7 +80,22 @@ class ImportController extends BaseController
                 'TUREN-2.xlsx',
                 'TUREN-3.xlsx',
                 'WAGIR.xlsx',
-                'WONOSARI.xlsx'
+                'DAU-2.xlsx',
+                'DAU-3.xlsx',
+                'KALIPARE-1.xlsx',
+                'KALIPARE-2.xlsx',
+                'KARANGPLOSO-1.xlsx',
+                'KARANGPLOSO-2.xlsx',
+                'KEPANJEN-1.xlsx',
+                'KEPANJEN-2.xlsx',
+                'KEPANJEN-3.xlsx',
+                'PAKISAJI-1.xlsx',
+                'PAKISAJI-2.xlsx',
+                'SUMAWE-1.xlsx',
+                'SUMAWE-2.xlsx',
+                'SUMAWE-3.xlsx',
+                'TUMPANG-1.xlsx',
+                'TUMPANG-2.xlsx'
             ];
 
             foreach ($arr as $val) {
