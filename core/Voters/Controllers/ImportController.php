@@ -11,12 +11,13 @@ use Core\Voters\Models\VotersPraDpsModel;
 
 class ImportController extends BaseController
 {
-    public function copy() {
+    public function copy()
+    {
         $generate = new GenerateModel();
         $generate->setActiveTable('voters_pra_dps')
                 ->setSourceTable('voters_original')
                 ->runInitialData();
-        
+
         print "Berhasil copy voters_original ke voters_pra_dps at " .date("Y-m-d H:i:s"). PHP_EOL;
         ob_flush();
     }
@@ -24,90 +25,16 @@ class ImportController extends BaseController
     public function run()
     {
         try {
-            $arr = [
-                'BANTUR-2.xlsx',
-                'BANTUR.xlsx',
-                'BULULAWANG-2.xlsx',
-                'DONOMULYO-2.xlsx',
-                'DONOMULYO-3.xlsx',
-                'GEDANGAN-2.xlsx',
-                'GONDANGLEGI-3.xlsx',
-                'JABUNG-2.xlsx',
-                'KROMENGAN-2.xlsx',
-                'NGAJUM-2.xlsx',
-                'PAGAK-2.xlsx',
-                'PAGELARAN-2.xlsx',
-                'PUJON-2.xlsx',
-                'PUJON.xlsx',
-                'SINGOSARI-2.xlsx',
-                'SINGOSARI-3.xlsx',
-                'SINGOSARI-4.xlsx',
-                'SINGOSARI-5.xlsx',
-                'SUMBERPUCUNG-2.xlsx',
-                'TAJINAN-2.xlsx',
-                'TIRTOYUDO-2.xlsx',
-                'TIRTOYUDO-3.xlsx',
-                'WAGIR-2.xlsx',
-                'WONOSARI-2.xlsx',
-                'AMPELGADING-2.xlsx',
-                'AMPELGADING.xlsx',
-                'BULULAWANG.xlsx',
-                'DAMPIT.xlsx',
-                'DAMPIT-2.xlsx',
-                'DAMPIT-3.xlsx',
-                'DONOMULYO.xlsx',
-                'GEDANGAN.xlsx',
-                'GONDANGLEGI.xlsx',
-                'GONDANGLEGI-2.xlsx',
-                'JABUNG.xlsx',
-                'KASEMBON.xlsx',
-                'KROMENGAN.xlsx',
-                'LAWANG.xlsx',
-                'LAWANG-2.xlsx',
-                'LAWANG-3.xlsx',
-                'NGAJUM.xlsx',
-                'PAGAK.xlsx',
-                'PAGELARAN.xlsx',
-                'PAKIS.xlsx',
-                'PAKIS-2.xlsx',
-                'PAKIS-3.xlsx',
-                'PAKIS-4.xlsx',
-                'SINGOSARI.xlsx',
-                'SUMBERPUCUNG.xlsx',
-                'TAJINAN.xlsx',
-                'TIRTOYUDO.xlsx',
-                'TUREN.xlsx',
-                'TUREN-2.xlsx',
-                'TUREN-3.xlsx',
-                'WAGIR.xlsx',
-                'DAU-2.xlsx',
-                'DAU-3.xlsx',
-                'KALIPARE-1.xlsx',
-                'KALIPARE-2.xlsx',
-                'KARANGPLOSO-1.xlsx',
-                'KARANGPLOSO-2.xlsx',
-                'KEPANJEN-1.xlsx',
-                'KEPANJEN-2.xlsx',
-                'KEPANJEN-3.xlsx',
-                'PAKISAJI-1.xlsx',
-                'PAKISAJI-2.xlsx',
-                'SUMAWE-1.xlsx',
-                'SUMAWE-2.xlsx',
-                'SUMAWE-3.xlsx',
-                'TUMPANG-1.xlsx',
-                'TUMPANG-2.xlsx'
-            ];
+            $files = array_diff(scandir(APPPATH."Database/Xls/"), array('.', '..'));
+            foreach ($files as $val) {
+                if (!preg_match("/xlsx/i", $val)) {
+                    continue;
+                }
 
-            foreach ($arr as $val) {
                 $file = APPPATH."Database/Xls/".$val;
-                print "Mulai import : $val at " .date("Y-m-d H:i:s"). PHP_EOL;
-                ob_flush();
-                flush();
+
                 if (file_exists($file)) {
                     $this->fastExcelReader($file);
-                    print "Berhasil import : $val at " .date("Y-m-d H:i:s"). PHP_EOL;
-                    ob_flush();
-                    flush();
                 }
             }
         } catch (\Throwable $th) {
@@ -153,8 +80,8 @@ class ImportController extends BaseController
                     'disabilities' => $val['O'],
                     'filters' => $val['P'],
                     'm_data_status_id' => 1,
-                    'tps' => $val['R'],
-                    'sort_data' => $val['T'],
+                    'tps' => isset($val['T']) ? $val['R'] : $val['Q'],
+                    'sort_data' => $val['T'] ?? '',
                 ];
 
                 if (count($arr) > 20000) {
@@ -163,15 +90,11 @@ class ImportController extends BaseController
                         $model = new VotersOriginalModel();
                         $model->insertBatch($arr);
                         echo "Insert data original : ".count($val)." data ".$fileName." at " .date("H:i:s"). PHP_EOL;
-                        ob_flush();
-                        flush();
-
+                        
                         // Insert data pra Dps
                         $model = new VotersPraDpsModel();
                         $model->insertBatch($arr);
                         echo "Insert data original : ".count($val)." data ".$fileName." at " .date("H:i:s"). PHP_EOL;
-                        ob_flush();
-                        flush();
                     }
 
                     $arr = [];
@@ -197,7 +120,7 @@ class ImportController extends BaseController
             }
             $this->db->transRollback();
 
-            echo $th->getMessage();
+            print($th);
         }
     }
 
