@@ -74,13 +74,13 @@ class ImportController extends BaseController
 
                 $arr[] = [
                     'code' => isset($val['A']) && $val['A'] == '-' ? '' : $val['A'],
-                    'm_districts_id' => $region[$district]['district_id'] ?? substr($val['B'], 0, 8) ?? '0',
-                    'm_villages_id' => $region[$district][$village]['village_id'] ?? substr($val['C'], 0, 12) ?? '0',
+                    'm_districts_id' => $region[$district]['district_id'] ?? substr($val['B'] ?? '0', 0, 8) ?? '0',
+                    'm_villages_id' => $region[$district][$village]['village_id'] ?? substr($val['C'] ?? '0', 0, 12) ?? '0',
                     'dp_id' => isset($val['D']) && $val['D'] != '' ? $val['D'] : '0',
                     'nkk' => isset($val['E']) && $val['E'] != '' ? $val['E'] : '0',
                     'nik' => isset($val['F']) && $val['F'] != '' ? $val['F'] : '0',
                     'name' => isset($val['G']) && $val['G'] != '' ? $val['G'] : '0',
-                    'place_of_birth' => isset($val['H']) && $val['H'] == '' ? '0' : $val['H'],
+                    'place_of_birth' => isset($val['H']) && $val['H'] != '-' ? $val['H'] : '0',
                     'date_of_birth' => $this->dateOfBirth($val['I'] ?? '0'),
                     'married_status' => $this->marriedStatus($val['J'] ?? 0),
                     'gender' => $this->gender($val['K'] ?? 1),
