@@ -58,7 +58,7 @@ class ImportController extends BaseController
 
             // Remove all data from district
             if (isset($this->payload['is_reset']) && isset($this->payload['district_id'])) {
-                $praDps->softDeleteAll($this->payload['district_id']);
+                $praDps->softDeleteAll($this->payload['district_id'], $this->payload['village_id']);
             }
 
             $result = $excel->readRows();
@@ -71,6 +71,12 @@ class ImportController extends BaseController
 
                 $district = strtolower(str_replace(' ', '', $val['B'] ?? '0'));
                 $village = strtolower(str_replace(' ', '', $val['C'] ?? '0'));
+
+                // Skip if village id is not same
+                $villageId = $region[$district][$village]['village_id'] ?? '';
+                if(isset($this->payload['village_id']) && $this->payload['village_id'] != $villageId) {
+                    continue;
+                }
 
                 $arr[] = [
                     'code' => isset($val['A']) && $val['A'] == '-' ? '' : $val['A'],
