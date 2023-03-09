@@ -69,6 +69,8 @@ $routes->group('v1', static function ($routes) {
 
     $routes->post('tools/import/upload', '\Core\Voters\Controllers\ImportController::upload');
     $routes->post('tools/import/run', '\Core\Voters\Controllers\ImportController::importDistricts');
+
+    $routes->get('status-data', '\Core\StatusData\Controllers\GetStatusDataController::index');
 });
 
 $routes->cli('tools/import', '\Core\Voters\Controllers\ImportController::run');

@@ -68,6 +68,10 @@ class ProfileVotersController extends BaseVotersController
         $voter = new ProfileVotersModel();
         $previousTableName = $this->statusData->prev_table_source;
 
+        if (empty($this->profile->voters_original_id)) {
+            $this->profile->voters_original_id = 0;
+        }
+
         $this->oldProfile = $voter->setActiveTable($previousTableName)->getById($this->profile->voters_original_id);
         return $this;
     }
@@ -76,7 +80,7 @@ class ProfileVotersController extends BaseVotersController
     {
         $voter = new ProfileVotersModel();
 
-        $voterOldProfile = $this->oldProfile->toArray();
+        $voterOldProfile = $this->oldProfile ? $this->oldProfile->toArray() : [];
         $activeTableName = $this->statusData->active_table_source;
 
         return $voter->setActiveTable($activeTableName)
