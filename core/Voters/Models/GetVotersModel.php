@@ -31,7 +31,11 @@ class GetVotersModel extends BaseVotersModel
         }
 
         if (isset($payload["nik"]) && !empty($payload["nik"])) {
-            $this->where("{$this->table}.nik", $payload["nik"]);
+            if(is_numeric($payload["nik"])) {
+                $this->where("{$this->table}.nik", $payload["nik"]);
+            } else {
+                $this->like("{$this->table}.name", $payload["nik"]);
+            }
         }
 
         if (isset($payload["rt"]) && !empty($payload["rt"])) {
